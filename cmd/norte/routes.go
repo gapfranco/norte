@@ -47,6 +47,21 @@ func (app *application) routes() http.Handler {
 	protected := http.NewServeMux()
 	protected.HandleFunc("GET /", app.home)
 	protected.HandleFunc("GET /painel", app.painel)
+
+	// Cadastros — Negócios e Unidades
+	protected.HandleFunc("GET /cadastros/negocios", app.negociosList)
+	protected.HandleFunc("GET /cadastros/negocios/new", app.negocioNew)
+	protected.HandleFunc("POST /cadastros/negocios/new", app.negocioNewPost)
+	protected.HandleFunc("GET /cadastros/negocios/{id}/edit", app.negocioEdit)
+	protected.HandleFunc("POST /cadastros/negocios/{id}/edit", app.negocioEditPost)
+	protected.HandleFunc("POST /cadastros/negocios/{id}/delete", app.negocioDelete)
+	protected.HandleFunc("GET /cadastros/negocios/{id}/unidades", app.unidadesList)
+	protected.HandleFunc("GET /cadastros/negocios/{id}/unidades/new", app.unidadeNew)
+	protected.HandleFunc("POST /cadastros/negocios/{id}/unidades/new", app.unidadeNewPost)
+	protected.HandleFunc("GET /cadastros/negocios/{id}/unidades/{uid}/edit", app.unidadeEdit)
+	protected.HandleFunc("POST /cadastros/negocios/{id}/unidades/{uid}/edit", app.unidadeEditPost)
+	protected.HandleFunc("POST /cadastros/negocios/{id}/unidades/{uid}/delete", app.unidadeDelete)
+
 	protected.HandleFunc("GET /config/usuarios", app.usuariosList)
 	protected.HandleFunc("GET /config/usuarios/new", app.usuarioNew)
 	protected.HandleFunc("POST /config/usuarios/new", app.usuarioNewPost)

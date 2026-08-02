@@ -1,0 +1,125 @@
+{{define "main"}}
+<div class="page-list-wide">
+    <div class="page-toolbar">
+        <h2 class="text-xl font-semibold text-slate-900">Negócios</h2>
+        <a href="/cadastros/negocios/new" class="btn-primary w-full sm:w-auto">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Novo Negócio
+        </a>
+    </div>
+
+    <form method="GET" action="/cadastros/negocios" class="filter-bar">
+        <input type="text" name="nome" value="{{.Data.FilterNome}}" placeholder="Filtrar por nome..."
+            class="form-control">
+        <button type="submit" class="btn-primary w-full sm:w-auto">
+            Buscar
+        </button>
+        {{if .Data.FilterNome}}
+        <a href="/cadastros/negocios" class="btn-secondary w-full sm:w-auto">
+            Limpar
+        </a>
+        {{end}}
+    </form>
+
+    <div class="table-card">
+        {{if .Data.Negocios}}
+        <div class="mobile-card-list">
+            {{range .Data.Negocios}}
+            <div class="mobile-card">
+                <div class="min-w-0">
+                    <p class="mobile-card-title truncate">
+                        {{.Nome}}
+                        {{if not .Ativo}}<span class="ml-1 badge badge-muted">Inativo</span>{{end}}
+                    </p>
+                    <p class="mobile-card-meta">
+                        {{if .NomeFantasia}}<span>{{.NomeFantasia}}</span>{{end}}
+                        {{if .Documento}}<span>{{.Documento}}</span>{{end}}
+                        <span>{{.Unidades}} unidade(s)</span>
+                    </p>
+                </div>
+                <div class="mobile-card-actions">
+                    <a href="/cadastros/negocios/{{.ID}}/unidades" class="btn-ghost btn-sm">Unidades</a>
+                    <a href="/cadastros/negocios/{{.ID}}/edit" class="btn-ghost btn-sm">Alterar</a>
+                    <form action="/cadastros/negocios/{{.ID}}/delete" method="POST" onsubmit="return confirm('Confirma a exclusão do negócio {{.Nome}} e suas unidades?')">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                        <button type="submit" class="btn-danger btn-sm">Excluir</button>
+                    </form>
+                </div>
+            </div>
+            {{end}}
+        </div>
+
+        <div class="hidden sm:block table-scroll">
+        <table class="list-table">
+            <thead class="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+                <tr>
+                    <th class="px-6 py-3">Nome</th>
+                    <th class="px-6 py-3">Nome fantasia</th>
+                    <th class="px-6 py-3">Documento</th>
+                    <th class="px-6 py-3 text-center">Unidades</th>
+                    <th class="px-6 py-3 text-center">Situação</th>
+                    <th class="px-6 py-3 text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {{range .Data.Negocios}}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 font-medium text-slate-800">{{.Nome}}</td>
+                    <td class="px-6 py-4 text-slate-700">{{if .NomeFantasia}}{{.NomeFantasia}}{{else}}<span class="text-slate-300">—</span>{{end}}</td>
+                    <td class="px-6 py-4 text-slate-700">{{if .Documento}}{{.Documento}}{{else}}<span class="text-slate-300">—</span>{{end}}</td>
+                    <td class="px-6 py-4 text-center text-slate-700">{{.Unidades}}</td>
+                    <td class="px-6 py-4 text-center">
+                        {{if .Ativo}}
+                        <span class="badge badge-success">Ativo</span>
+                        {{else}}
+                        <span class="badge badge-muted">Inativo</span>
+                        {{end}}
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="inline-flex items-center gap-2">
+                            <a href="/cadastros/negocios/{{.ID}}/unidades" class="btn-ghost btn-sm">Unidades</a>
+                            <a href="/cadastros/negocios/{{.ID}}/edit" class="btn-ghost btn-sm">Alterar</a>
+                            <form action="/cadastros/negocios/{{.ID}}/delete" method="POST" onsubmit="return confirm('Confirma a exclusão do negócio {{.Nome}} e suas unidades?')">
+                                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                                <button type="submit" class="btn-danger btn-sm">Excluir</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+        </div>
+
+        <div class="pagination-bar">
+            <div>
+                Mostrando <span class="font-bold">{{len .Data.Negocios}}</span> de <span class="font-bold">{{.Data.Pagination.TotalItems}}</span> registros
+            </div>
+            <div class="pagination-pages">
+                <a href="/cadastros/negocios?page={{.Data.Pagination.PrevPage}}&nome={{.Data.FilterNome}}"
+                    class="pagination-btn {{if not .Data.Pagination.HasPrev}}pagination-btn-disabled{{end}}">
+                    Anterior
+                </a>
+                {{range .Data.Pagination.Pages}}
+                {{if .Ellipsis}}
+                <span class="pagination-ellipsis">…</span>
+                {{else if .Current}}
+                <span class="pagination-current">{{.Page}}</span>
+                {{else}}
+                <a href="/cadastros/negocios?page={{.Page}}&nome={{$.Data.FilterNome}}" class="pagination-btn">{{.Page}}</a>
+                {{end}}
+                {{end}}
+                <a href="/cadastros/negocios?page={{.Data.Pagination.NextPage}}&nome={{.Data.FilterNome}}"
+                    class="pagination-btn {{if not .Data.Pagination.HasNext}}pagination-btn-disabled{{end}}">
+                    Próxima
+                </a>
+            </div>
+        </div>
+        {{else}}
+        <div class="p-12 text-center text-slate-400 italic">
+            {{if .Data.FilterNome}}Nenhum negócio encontrado para o filtro informado.{{else}}Nenhum negócio cadastrado.{{end}}
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}
