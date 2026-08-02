@@ -1,0 +1,33 @@
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+build/
+out/
+dist/
+data/
+ui/static/css/styles.css
+local.*
+cmd/norte/__debug*
+/norte
+
+# Testes e Cobertura
+*.test
+*.out
+coverage.txt
+profile.out
+
+# IDEs e Editores
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Variáveis de Ambiente
+.env
+norte.conf
+
+# Dependências
+vendor/

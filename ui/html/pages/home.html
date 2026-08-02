@@ -1,0 +1,166 @@
+{{define "main"}}
+<div class="max-w-4xl mx-auto">
+    <header class="page-header text-center md:text-left">
+        <p class="page-header-eyebrow">Norte</p>
+        <h1 class="page-header-title">Gestão Operacional</h1>
+        <p class="mt-1 text-sm font-semibold text-slate-600">Direcionando seus negócios com segurança</p>
+    </header>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <a href="/painel" class="table-card flex flex-col h-full p-5 hover:border-navy-300 hover:shadow-md transition-all group">
+            <div class="flex items-center justify-between">
+                <div class="w-10 h-10 rounded-lg bg-navy-100 text-navy-600 flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
+                </div>
+                <svg class="w-4 h-4 text-slate-300 group-hover:text-navy-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </div>
+            <h2 class="mt-4 font-semibold text-slate-900">Painel</h2>
+            <p class="mt-1 text-sm text-slate-600">Visão geral da operação e indicadores.</p>
+        </a>
+
+        <div class="relative dropdown-container h-full">
+            <button type="button" onclick="openHomeMenu('home-menu-cadastros', event)" class="table-card flex flex-col w-full h-full p-5 text-left hover:border-navy-300 hover:shadow-md transition-all group cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-300 group-hover:text-navy-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+                <h2 class="mt-4 font-semibold text-slate-900">Cadastros</h2>
+                <p class="mt-1 text-sm text-slate-600">Pessoas, produtos, bancos e contas.</p>
+            </button>
+            <div id="home-menu-cadastros" class="dropdown-menu home-card-dropdown hidden w-56">
+                <span class="nav-dropdown-item-disabled">Negócios / Unidades <span class="badge badge-muted">Em breve</span></span>
+                <span class="nav-dropdown-item-disabled">Pessoas <span class="badge badge-muted">Em breve</span></span>
+                <span class="nav-dropdown-item-disabled">Produtos <span class="badge badge-muted">Em breve</span></span>
+                <span class="nav-dropdown-item-disabled">Categorias <span class="badge badge-muted">Em breve</span></span>
+                <span class="nav-dropdown-item-disabled">Bancos <span class="badge badge-muted">Em breve</span></span>
+                <span class="nav-dropdown-item-disabled">Contas <span class="badge badge-muted">Em breve</span></span>
+            </div>
+        </div>
+
+        <div class="relative dropdown-container h-full">
+            <button type="button" onclick="openHomeMenu('home-menu-compras', event)" class="table-card flex flex-col w-full h-full p-5 text-left hover:border-navy-300 hover:shadow-md transition-all group cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-300 group-hover:text-navy-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+                <h2 class="mt-4 font-semibold text-slate-900">Compras</h2>
+                <p class="mt-1 text-sm text-slate-600">Pedidos de compra e entradas.</p>
+            </button>
+            <div id="home-menu-compras" class="dropdown-menu home-card-dropdown hidden w-52">
+                <span class="nav-dropdown-item-disabled">Pedidos <span class="badge badge-muted">Em breve</span></span>
+            </div>
+        </div>
+
+        <div class="relative dropdown-container h-full">
+            <button type="button" onclick="openHomeMenu('home-menu-vendas', event)" class="table-card flex flex-col w-full h-full p-5 text-left hover:border-navy-300 hover:shadow-md transition-all group cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div class="w-10 h-10 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-300 group-hover:text-navy-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+                <h2 class="mt-4 font-semibold text-slate-900">Vendas</h2>
+                <p class="mt-1 text-sm text-slate-600">Pedidos, faturas e saídas.</p>
+            </button>
+            <div id="home-menu-vendas" class="dropdown-menu home-card-dropdown hidden w-52">
+                <span class="nav-dropdown-item-disabled">Pedidos / Faturas <span class="badge badge-muted">Em breve</span></span>
+            </div>
+        </div>
+
+        <div class="relative dropdown-container h-full">
+            <button type="button" onclick="openHomeMenu('home-menu-estoque', event)" class="table-card flex flex-col w-full h-full p-5 text-left hover:border-navy-300 hover:shadow-md transition-all group cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div class="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-300 group-hover:text-navy-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+                <h2 class="mt-4 font-semibold text-slate-900">Estoque</h2>
+                <p class="mt-1 text-sm text-slate-600">Saldos, movimentos e ajustes.</p>
+            </button>
+            <div id="home-menu-estoque" class="dropdown-menu home-card-dropdown hidden w-52">
+                <span class="nav-dropdown-item-disabled">Saldos <span class="badge badge-muted">Em breve</span></span>
+                <span class="nav-dropdown-item-disabled">Movimentos <span class="badge badge-muted">Em breve</span></span>
+                <span class="nav-dropdown-item-disabled">Ajustes <span class="badge badge-muted">Em breve</span></span>
+            </div>
+        </div>
+
+        <div class="relative dropdown-container h-full">
+            <button type="button" onclick="openHomeMenu('home-menu-financeiro', event)" class="table-card flex flex-col w-full h-full p-5 text-left hover:border-navy-300 hover:shadow-md transition-all group cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-300 group-hover:text-navy-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+                <h2 class="mt-4 font-semibold text-slate-900">Financeiro</h2>
+                <p class="mt-1 text-sm text-slate-600">Títulos a pagar, a receber e baixas.</p>
+            </button>
+            <div id="home-menu-financeiro" class="dropdown-menu home-card-dropdown hidden w-52">
+                <span class="nav-dropdown-item-disabled">A Pagar <span class="badge badge-muted">Em breve</span></span>
+                <span class="nav-dropdown-item-disabled">A Receber <span class="badge badge-muted">Em breve</span></span>
+                <span class="nav-dropdown-item-disabled">Baixas <span class="badge badge-muted">Em breve</span></span>
+                <span class="nav-dropdown-item-disabled">Cobranças <span class="badge badge-muted">Em breve</span></span>
+            </div>
+        </div>
+
+        <div class="relative dropdown-container h-full">
+            <button type="button" onclick="openHomeMenu('home-menu-banco', event)" class="table-card flex flex-col w-full h-full p-5 text-left hover:border-navy-300 hover:shadow-md transition-all group cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div class="w-10 h-10 rounded-lg bg-cyan-100 text-cyan-600 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-300 group-hover:text-navy-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+                <h2 class="mt-4 font-semibold text-slate-900">Banco</h2>
+                <p class="mt-1 text-sm text-slate-600">Importação OFX e conciliação.</p>
+            </button>
+            <div id="home-menu-banco" class="dropdown-menu home-card-dropdown hidden w-52">
+                <span class="nav-dropdown-item-disabled">Importar OFX <span class="badge badge-muted">Em breve</span></span>
+                <span class="nav-dropdown-item-disabled">Conciliação <span class="badge badge-muted">Em breve</span></span>
+            </div>
+        </div>
+
+        <div class="relative dropdown-container h-full">
+            <button type="button" onclick="openHomeMenu('home-menu-relatorios', event)" class="table-card flex flex-col w-full h-full p-5 text-left hover:border-navy-300 hover:shadow-md transition-all group cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div class="w-10 h-10 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-300 group-hover:text-navy-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+                <h2 class="mt-4 font-semibold text-slate-900">Relatórios</h2>
+                <p class="mt-1 text-sm text-slate-600">Fluxo de caixa, abertos e extrato.</p>
+            </button>
+            <div id="home-menu-relatorios" class="dropdown-menu home-card-dropdown hidden w-56">
+                <span class="nav-dropdown-item-disabled">Fluxo de Caixa <span class="badge badge-muted">Em breve</span></span>
+                <span class="nav-dropdown-item-disabled">Abertos <span class="badge badge-muted">Em breve</span></span>
+                <span class="nav-dropdown-item-disabled">Vencidos <span class="badge badge-muted">Em breve</span></span>
+                <span class="nav-dropdown-item-disabled">Extrato <span class="badge badge-muted">Em breve</span></span>
+            </div>
+        </div>
+
+        <div class="relative dropdown-container h-full">
+            <button type="button" onclick="openHomeMenu('home-menu-config', event)" class="table-card flex flex-col w-full h-full p-5 text-left hover:border-navy-300 hover:shadow-md transition-all group cursor-pointer">
+                <div class="flex items-center justify-between">
+                    <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-300 group-hover:text-navy-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+                <h2 class="mt-4 font-semibold text-slate-900">Configurações</h2>
+                <p class="mt-1 text-sm text-slate-600">Usuários, senha e integrações.</p>
+            </button>
+            <div id="home-menu-config" class="dropdown-menu home-card-dropdown hidden w-44">
+                <a href="/config/usuarios" class="nav-dropdown-item">Usuários</a>
+                <a href="/config/senha" class="nav-dropdown-item">Alterar senha</a>
+                <span class="nav-dropdown-item-disabled">Integrações <span class="badge badge-muted">Em breve</span></span>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

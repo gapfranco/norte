@@ -1,0 +1,125 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Norte - Gestão Operacional</title>
+    <meta name="color-scheme" content="light only">
+    {{template "pwa" .}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="/static/js/htmx.min.js"></script>
+    <meta name="csrf-token" content="{{.CSRFToken}}">
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased" style="font-family: Inter, ui-sans-serif, system-ui, sans-serif" hx-headers='{"X-CSRF-Token": "{{.CSRFToken}}"}'>
+
+<nav class="bg-white border-b border-slate-200 shadow-sm relative z-40 overflow-visible safe-nav">
+    <div class="app-shell overflow-visible">
+        <div class="flex justify-between items-center h-14 overflow-visible">
+            <div class="flex items-center gap-4 md:gap-8 min-w-0 overflow-visible">
+                {{if .IsAuthenticated}}
+                <button type="button" onclick="toggleMobileMenu()" class="md:hidden p-2 -ml-2 rounded-lg text-slate-600 hover:bg-slate-100" aria-label="Abrir menu" aria-expanded="false" id="mobile-menu-btn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                {{end}}
+                <a href="/" class="shrink-0 inline-flex items-center gap-2">
+                    <img src="/static/icons/norte-icon.svg" alt="" width="28" height="28" class="h-7 w-7 rounded-md">
+                    <span class="text-xl font-bold text-navy-600 tracking-tight">Norte</span>
+                </a>
+                {{template "nav" .}}
+            </div>
+            {{if .IsAuthenticated}}
+            <div class="flex items-center gap-3 shrink-0">
+                {{if .CurrentUser}}
+                <span class="hidden sm:flex items-center gap-2 text-sm text-slate-600">
+                    <span class="user-avatar">{{userInitial .CurrentUser}}</span>
+                    <span class="max-w-[8rem] truncate">{{.CurrentUser}}</span>
+                </span>
+                {{end}}
+                <form action="/logout" method="POST">
+                    <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
+                    <button type="submit" class="btn-secondary btn-sm">Sair</button>
+                </form>
+            </div>
+            {{end}}
+        </div>
+    </div>
+</nav>
+
+{{if .IsAuthenticated}}
+<div id="mobile-menu" class="nav-mobile-panel hidden" aria-hidden="true">
+    <div class="nav-mobile-backdrop" onclick="toggleMobileMenu(false)"></div>
+    <div class="nav-mobile-drawer">
+        <div class="flex items-center justify-between px-4 py-4 border-b border-slate-200">
+            <span class="font-semibold text-slate-900">Menu</span>
+            <button type="button" onclick="toggleMobileMenu(false)" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100" aria-label="Fechar menu">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto py-2">
+            {{template "nav_mobile" .}}
+        </div>
+    </div>
+</div>
+{{end}}
+
+<main class="app-shell py-8 safe-main">
+    {{template "flash_banner" .}}
+    {{template "main" .}}
+</main>
+
+<script>
+function toggleMenu(id, event) {
+    if (event) event.stopPropagation();
+    const menu = document.getElementById(id);
+    if (!menu) return;
+    const isHidden = menu.classList.contains('hidden');
+    document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden'));
+    if (isHidden) menu.classList.remove('hidden');
+}
+
+function openHomeMenu(id, event) {
+    if (event) event.stopPropagation();
+    const menu = document.getElementById(id);
+    if (!menu) return;
+    const isHidden = menu.classList.contains('hidden');
+    document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden'));
+    if (isHidden) menu.classList.remove('hidden');
+}
+
+function toggleMobileMenu(open) {
+    const panel = document.getElementById('mobile-menu');
+    const btn = document.getElementById('mobile-menu-btn');
+    if (!panel) return;
+    const shouldOpen = open !== undefined ? open : panel.classList.contains('hidden');
+    panel.classList.toggle('hidden', !shouldOpen);
+    panel.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
+    if (btn) btn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+    document.body.classList.toggle('overflow-hidden', shouldOpen);
+}
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown-container')) {
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden'));
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        toggleMobileMenu(false);
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden'));
+    }
+});
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js', {scope: '/'}).catch(function() {});
+    });
+}
+</script>
+</body>
+</html>
+{{end}}

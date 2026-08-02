@@ -1,0 +1,153 @@
+{{define "nav"}}
+<div class="hidden md:flex items-center h-10 gap-0">
+    {{if .IsAuthenticated}}
+
+    <!-- Cadastros -->
+    <div class="relative dropdown-container h-full flex items-center">
+        <button type="button" onclick="toggleMenu('menu-cadastros', event)" class="nav-link {{if eq .ActiveMenu "cadastros"}}nav-link-active{{else}}nav-link-inactive{{end}}">
+            Cadastros
+            <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="menu-cadastros" class="dropdown-menu nav-dropdown hidden w-56">
+            <span class="nav-dropdown-item-disabled">Negócios / Unidades <span class="badge badge-muted">Em breve</span></span>
+            <span class="nav-dropdown-item-disabled">Pessoas <span class="badge badge-muted">Em breve</span></span>
+            <span class="nav-dropdown-item-disabled">Produtos <span class="badge badge-muted">Em breve</span></span>
+            <span class="nav-dropdown-item-disabled">Categorias <span class="badge badge-muted">Em breve</span></span>
+            <span class="nav-dropdown-item-disabled">Bancos <span class="badge badge-muted">Em breve</span></span>
+            <span class="nav-dropdown-item-disabled">Contas <span class="badge badge-muted">Em breve</span></span>
+        </div>
+    </div>
+
+    <!-- Compras -->
+    <div class="relative dropdown-container h-full flex items-center">
+        <button type="button" onclick="toggleMenu('menu-compras', event)" class="nav-link {{if eq .ActiveMenu "compras"}}nav-link-active{{else}}nav-link-inactive{{end}}">
+            Compras
+            <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="menu-compras" class="dropdown-menu nav-dropdown hidden w-52">
+            <span class="nav-dropdown-item-disabled">Pedidos <span class="badge badge-muted">Em breve</span></span>
+        </div>
+    </div>
+
+    <!-- Vendas -->
+    <div class="relative dropdown-container h-full flex items-center">
+        <button type="button" onclick="toggleMenu('menu-vendas', event)" class="nav-link {{if eq .ActiveMenu "vendas"}}nav-link-active{{else}}nav-link-inactive{{end}}">
+            Vendas
+            <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="menu-vendas" class="dropdown-menu nav-dropdown hidden w-52">
+            <span class="nav-dropdown-item-disabled">Pedidos / Faturas <span class="badge badge-muted">Em breve</span></span>
+        </div>
+    </div>
+
+    <!-- Estoque -->
+    <div class="relative dropdown-container h-full flex items-center">
+        <button type="button" onclick="toggleMenu('menu-estoque', event)" class="nav-link {{if eq .ActiveMenu "estoque"}}nav-link-active{{else}}nav-link-inactive{{end}}">
+            Estoque
+            <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="menu-estoque" class="dropdown-menu nav-dropdown hidden w-52">
+            <span class="nav-dropdown-item-disabled">Saldos <span class="badge badge-muted">Em breve</span></span>
+            <span class="nav-dropdown-item-disabled">Movimentos <span class="badge badge-muted">Em breve</span></span>
+            <span class="nav-dropdown-item-disabled">Ajustes <span class="badge badge-muted">Em breve</span></span>
+        </div>
+    </div>
+
+    <!-- Financeiro -->
+    <div class="relative dropdown-container h-full flex items-center">
+        <button type="button" onclick="toggleMenu('menu-financeiro', event)" class="nav-link {{if eq .ActiveMenu "financeiro"}}nav-link-active{{else}}nav-link-inactive{{end}}">
+            Financeiro
+            <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="menu-financeiro" class="dropdown-menu nav-dropdown hidden w-52">
+            <span class="nav-dropdown-item-disabled">A Pagar <span class="badge badge-muted">Em breve</span></span>
+            <span class="nav-dropdown-item-disabled">A Receber <span class="badge badge-muted">Em breve</span></span>
+            <span class="nav-dropdown-item-disabled">Baixas <span class="badge badge-muted">Em breve</span></span>
+            <span class="nav-dropdown-item-disabled">Cobranças <span class="badge badge-muted">Em breve</span></span>
+        </div>
+    </div>
+
+    <!-- Banco -->
+    <div class="relative dropdown-container h-full flex items-center">
+        <button type="button" onclick="toggleMenu('menu-banco', event)" class="nav-link {{if eq .ActiveMenu "banco"}}nav-link-active{{else}}nav-link-inactive{{end}}">
+            Banco
+            <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="menu-banco" class="dropdown-menu nav-dropdown hidden w-52">
+            <span class="nav-dropdown-item-disabled">Importar OFX <span class="badge badge-muted">Em breve</span></span>
+            <span class="nav-dropdown-item-disabled">Conciliação <span class="badge badge-muted">Em breve</span></span>
+        </div>
+    </div>
+
+    <!-- Relatórios -->
+    <div class="relative dropdown-container h-full flex items-center">
+        <button type="button" onclick="toggleMenu('menu-relatorios', event)" class="nav-link {{if eq .ActiveMenu "relatorios"}}nav-link-active{{else}}nav-link-inactive{{end}}">
+            Relatórios
+            <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="menu-relatorios" class="dropdown-menu nav-dropdown hidden w-56">
+            <span class="nav-dropdown-item-disabled">Fluxo de Caixa <span class="badge badge-muted">Em breve</span></span>
+            <span class="nav-dropdown-item-disabled">Abertos <span class="badge badge-muted">Em breve</span></span>
+            <span class="nav-dropdown-item-disabled">Vencidos <span class="badge badge-muted">Em breve</span></span>
+            <span class="nav-dropdown-item-disabled">Extrato <span class="badge badge-muted">Em breve</span></span>
+        </div>
+    </div>
+
+    <!-- Configurações -->
+    <div class="relative dropdown-container h-full flex items-center">
+        <button type="button" onclick="toggleMenu('menu-config', event)" class="nav-link {{if eq .ActiveMenu "config"}}nav-link-active{{else}}nav-link-inactive{{end}}">
+            Configurações
+            <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="menu-config" class="dropdown-menu nav-dropdown hidden w-44">
+            <a href="/config/usuarios" class="nav-dropdown-item {{if eq .ActiveSubmenu "usuarios"}}nav-dropdown-item-active{{end}}">Usuários</a>
+            <a href="/config/senha" class="nav-dropdown-item {{if eq .ActiveSubmenu "senha"}}nav-dropdown-item-active{{end}}">Alterar senha</a>
+            <span class="nav-dropdown-item-disabled">Integrações <span class="badge badge-muted">Em breve</span></span>
+        </div>
+    </div>
+
+    {{end}}
+</div>
+{{end}}
+
+{{define "nav_mobile"}}
+<p class="nav-mobile-section">Cadastros</p>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Negócios / Unidades <span class="badge badge-muted">Em breve</span></span>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Pessoas <span class="badge badge-muted">Em breve</span></span>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Produtos <span class="badge badge-muted">Em breve</span></span>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Categorias <span class="badge badge-muted">Em breve</span></span>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Bancos <span class="badge badge-muted">Em breve</span></span>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Contas <span class="badge badge-muted">Em breve</span></span>
+
+<p class="nav-mobile-section">Compras</p>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Pedidos <span class="badge badge-muted">Em breve</span></span>
+
+<p class="nav-mobile-section">Vendas</p>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Pedidos / Faturas <span class="badge badge-muted">Em breve</span></span>
+
+<p class="nav-mobile-section">Estoque</p>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Saldos <span class="badge badge-muted">Em breve</span></span>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Movimentos <span class="badge badge-muted">Em breve</span></span>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Ajustes <span class="badge badge-muted">Em breve</span></span>
+
+<p class="nav-mobile-section">Financeiro</p>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">A Pagar <span class="badge badge-muted">Em breve</span></span>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">A Receber <span class="badge badge-muted">Em breve</span></span>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Baixas <span class="badge badge-muted">Em breve</span></span>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Cobranças <span class="badge badge-muted">Em breve</span></span>
+
+<p class="nav-mobile-section">Banco</p>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Importar OFX <span class="badge badge-muted">Em breve</span></span>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Conciliação <span class="badge badge-muted">Em breve</span></span>
+
+<p class="nav-mobile-section">Relatórios</p>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Fluxo de Caixa <span class="badge badge-muted">Em breve</span></span>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Abertos <span class="badge badge-muted">Em breve</span></span>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Vencidos <span class="badge badge-muted">Em breve</span></span>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Extrato <span class="badge badge-muted">Em breve</span></span>
+
+<p class="nav-mobile-section">Configurações</p>
+<a href="/config/usuarios" class="nav-mobile-link {{if eq .ActiveSubmenu "usuarios"}}nav-mobile-link-active{{end}}">Usuários</a>
+<a href="/config/senha" class="nav-mobile-link {{if eq .ActiveSubmenu "senha"}}nav-mobile-link-active{{end}}">Alterar senha</a>
+<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Integrações <span class="badge badge-muted">Em breve</span></span>
+{{end}}

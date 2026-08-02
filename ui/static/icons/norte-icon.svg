@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Norte">
+  <rect width="512" height="512" rx="96" ry="96" fill="#0b4276"/>
+
+  <!-- Outer ring -->
+  <circle cx="256" cy="256" r="168" fill="none" stroke="#4d7cbb" stroke-width="12"/>
+  <circle cx="256" cy="256" r="168" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.35"/>
+
+  <!-- Four equal thin arms (identical length and thickness) -->
+  <g stroke="#ffffff" stroke-width="10" stroke-linecap="round">
+    <line x1="256" y1="100" x2="256" y2="198"/>
+    <line x1="256" y1="314" x2="256" y2="412"/>
+    <line x1="100" y1="256" x2="198" y2="256"/>
+    <line x1="314" y1="256" x2="412" y2="256"/>
+  </g>
+  <!-- Soft inner accent on each arm -->
+  <g stroke="#82a6d4" stroke-width="4" stroke-linecap="round">
+    <line x1="256" y1="104" x2="256" y2="194"/>
+    <line x1="256" y1="318" x2="256" y2="408"/>
+    <line x1="104" y1="256" x2="194" y2="256"/>
+    <line x1="318" y1="256" x2="408" y2="256"/>
+  </g>
+
+  <!-- NE needle: same length as arms, orange, no arrow tip -->
+  <line x1="297" y1="215" x2="366" y2="146" stroke="#f97316" stroke-width="28" stroke-linecap="round"/>
+
+  <!-- Orange arc outside the ring: NE tip → North (gap ≥ 2/3 of stroke = ~19px) -->
+  <path
+    d="M 411.6 100.4 A 220 220 0 0 0 256 36"
+    fill="none"
+    stroke="#f97316"
+    stroke-width="28"
+    stroke-linecap="round"/>
+
+  <!-- Hub disc -->
+  <circle cx="256" cy="256" r="58" fill="#ffffff"/>
+
+  <!-- Dollar sign -->
+  <text
+    x="256"
+    y="256"
+    fill="#0b4276"
+    font-family="DejaVu Sans, Liberation Sans, Arial, Helvetica, sans-serif"
+    font-size="92"
+    font-weight="700"
+    text-anchor="middle"
+    dominant-baseline="central">$</text>
+</svg>
