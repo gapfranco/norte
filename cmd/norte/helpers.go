@@ -16,6 +16,22 @@ import (
 	"github.com/justinas/nosurf"
 )
 
+func isUniqueConstraintError(err error) bool {
+	if err == nil {
+		return false
+	}
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "unique constraint")
+}
+
+func isCNPJUniqueError(err error) bool {
+	if !isUniqueConstraintError(err) {
+		return false
+	}
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "cnpj")
+}
+
 // syncDB replica alterações locais ao Turso Cloud (modo sync) e puxa o delta remoto.
 // No-op em modos local e remote. Em falha, registra Error e deixa flash para o usuário.
 func (app *application) syncDB(ctx context.Context) {

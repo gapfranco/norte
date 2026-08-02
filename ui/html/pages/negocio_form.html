@@ -1,5 +1,29 @@
 {{define "main"}}
-<div class="page-form">
+<script>
+function validarCNPJ(cnpj) {
+    cnpj = cnpj.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    if (cnpj.length !== 14) return false;
+    if (!/^\d$/.test(cnpj[12]) || !/^\d$/.test(cnpj[13])) return false;
+    if ([...new Set(cnpj)].length === 1) return false;
+    const val = c => c.charCodeAt(0) - 48;
+    const dig = (s, ws) => { const r = ws.reduce((a,w,i) => a + val(s[i])*w, 0) % 11; return r < 2 ? 0 : 11-r; };
+    const w1 = [5,4,3,2,9,8,7,6,5,4,3,2], w2 = [6,5,4,3,2,9,8,7,6,5,4,3,2];
+    return dig(cnpj,w1) === parseInt(cnpj[12]) && dig(cnpj,w2) === parseInt(cnpj[13]);
+}
+function cnpjFeedback(input) {
+    const v = input.value.trim();
+    const hint = input.nextElementSibling;
+    if (v === '') { input.classList.remove('border-red-400','border-green-500'); if(hint) hint.textContent=''; return; }
+    if (validarCNPJ(v)) {
+        input.classList.remove('border-red-400'); input.classList.add('border-green-500');
+        if(hint) { hint.textContent='CNPJ válido'; hint.className='mt-1 text-xs text-green-600'; }
+    } else {
+        input.classList.remove('border-green-500'); input.classList.add('border-red-400');
+        if(hint) { hint.textContent='CNPJ inválido'; hint.className='mt-1 text-xs text-red-500'; }
+    }
+}
+</script>
+<div class="page-form-wide">
     <div class="flex items-center gap-3 mb-6">
         <a href="/cadastros/negocios" class="text-slate-400 hover:text-slate-700 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
@@ -9,44 +33,148 @@
         </h2>
     </div>
 
-    <div class="form-card">
-        <form action="{{if .Data.EditMode}}/cadastros/negocios/{{.Data.Negocio.ID}}/edit{{else}}/cadastros/negocios/new{{end}}" method="POST" class="space-y-5">
+    <div class="form-card mb-6">
+        {{if .Data.EditMode}}
+        <form action="/cadastros/negocios/{{.Data.Negocio.Codigo}}/edit" method="POST" class="space-y-5">
             <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
 
-            <div>
-                <label for="nome" class="block text-sm font-medium text-slate-800 mb-1">Nome</label>
-                <input type="text" id="nome" name="nome" value="{{.Data.Negocio.Nome}}" required autofocus
-                    class="form-control">
+            <div class="grid grid-cols-1 sm:grid-cols-[10rem_1fr_14rem] gap-4 items-start">
+                <div>
+                    <label class="block text-sm font-medium text-slate-800 mb-1">Código</label>
+                    <input type="text" value="{{.Data.Negocio.Codigo}}" disabled
+                        class="form-control text-slate-400">
+                    <p class="mt-1 text-xs text-slate-400">Não pode ser alterado.</p>
+                </div>
+                <div>
+                    <label for="nome" class="block text-sm font-medium text-slate-800 mb-1">Nome / Razão Social</label>
+                    <input type="text" id="nome" name="nome" value="{{.Data.Negocio.Nome}}" required autofocus
+                        class="form-control">
+                </div>
+                <div>
+                    <label for="cnpj" class="block text-sm font-medium text-slate-800 mb-1">CNPJ (opcional)</label>
+                    <input type="text" id="cnpj" name="cnpj" value="{{.Data.Negocio.CNPJ}}" onblur="cnpjFeedback(this)"
+                        class="form-control">
+                    <p class="mt-1 text-xs text-slate-400"></p>
+                </div>
             </div>
-
-            <div>
-                <label for="nome_fantasia" class="block text-sm font-medium text-slate-800 mb-1">Nome fantasia</label>
-                <input type="text" id="nome_fantasia" name="nome_fantasia" value="{{.Data.Negocio.NomeFantasia}}"
-                    class="form-control">
-            </div>
-
-            <div>
-                <label for="documento" class="block text-sm font-medium text-slate-800 mb-1">CNPJ / CPF</label>
-                <input type="text" id="documento" name="documento" value="{{.Data.Negocio.Documento}}"
-                    class="form-control">
-                <p class="mt-1 text-xs text-slate-400">Opcional.</p>
-            </div>
-
-            <label class="flex items-center gap-2 text-sm font-medium text-slate-800">
-                <input type="checkbox" name="ativo" value="true" {{if .Data.Negocio.Ativo}}checked{{end}}
-                    class="h-4 w-4 rounded border-slate-300 text-navy-600 focus:ring-navy-500">
-                Negócio ativo
-            </label>
 
             <div class="form-actions">
                 <button type="submit" class="btn-primary">
-                    {{if .Data.EditMode}}Salvar{{else}}Criar Negócio{{end}}
+                    Salvar
                 </button>
                 <a href="/cadastros/negocios" class="btn-secondary">
                     Cancelar
                 </a>
             </div>
         </form>
+        {{else}}
+        <form action="/cadastros/negocios/new" method="POST" class="space-y-5">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+            <div class="grid grid-cols-1 sm:grid-cols-[10rem_1fr_14rem] gap-4 items-start">
+                <div>
+                    <label for="codigo" class="block text-sm font-medium text-slate-800 mb-1">Código</label>
+                    <input type="text" id="codigo" name="codigo" value="{{with .Data.Negocio}}{{.Codigo}}{{end}}" required autofocus
+                        class="form-control">
+                    <p class="mt-1 text-xs text-slate-400">Identificador único. Não pode ser alterado depois.</p>
+                </div>
+                <div>
+                    <label for="nome" class="block text-sm font-medium text-slate-800 mb-1">Nome / Razão Social</label>
+                    <input type="text" id="nome" name="nome" value="{{with .Data.Negocio}}{{.Nome}}{{end}}" required
+                        class="form-control">
+                </div>
+                <div>
+                    <label for="cnpj" class="block text-sm font-medium text-slate-800 mb-1">CNPJ (opcional)</label>
+                    <input type="text" id="cnpj" name="cnpj" value="{{with .Data.Negocio}}{{.CNPJ}}{{end}}" onblur="cnpjFeedback(this)"
+                        class="form-control">
+                    <p class="mt-1 text-xs text-slate-400"></p>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    Criar Negócio
+                </button>
+                <a href="/cadastros/negocios" class="btn-secondary">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+        {{end}}
     </div>
+
+    {{if .Data.EditMode}}
+    <div class="mt-2">
+        <div class="page-toolbar mb-4">
+            <h3 class="text-base font-semibold text-slate-800">Unidades</h3>
+            <a href="/cadastros/negocios/{{.Data.Negocio.Codigo}}/unidades/new" class="btn-primary btn-sm w-full sm:w-auto">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Nova Unidade
+            </a>
+        </div>
+
+        <div class="table-card">
+            {{if .Data.Unidades}}
+            <div class="table-scroll">
+            <table class="list-table">
+                <thead class="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+                    <tr>
+                        <th class="px-6 py-3">Código</th>
+                        <th class="px-6 py-3">Nome</th>
+                        <th class="px-6 py-3">CNPJ</th>
+                        <th class="px-6 py-3 text-right">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {{range .Data.Unidades}}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 font-medium text-slate-800">{{.Codigo}}</td>
+                        <td class="px-6 py-4 text-slate-700">{{.Nome}}</td>
+                        <td class="px-6 py-4 text-slate-600">{{.CNPJ}}</td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="inline-flex items-center gap-2">
+                                <a href="/cadastros/negocios/{{.NegocioCodigo}}/unidades/{{.Codigo}}/edit" class="btn-ghost btn-sm">Alterar</a>
+                                <form action="/cadastros/negocios/{{.NegocioCodigo}}/unidades/{{.Codigo}}/delete" method="POST" onsubmit="return confirm('Confirma a exclusão da unidade {{.Codigo}}?')">
+                                    <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                                    <button type="submit" class="btn-danger btn-sm">Excluir</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+            </div>
+
+            <div class="pagination-bar">
+                <div>
+                    Mostrando <span class="font-bold">{{len .Data.Unidades}}</span> de <span class="font-bold">{{.Data.UniPagination.TotalItems}}</span> unidades
+                </div>
+                <div class="pagination-pages">
+                    <a href="/cadastros/negocios/{{.Data.Negocio.Codigo}}/edit?unidades_page={{.Data.UniPagination.PrevPage}}"
+                        class="pagination-btn {{if not .Data.UniPagination.HasPrev}}pagination-btn-disabled{{end}}">
+                        Anterior
+                    </a>
+                    {{range .Data.UniPagination.Pages}}
+                    {{if .Ellipsis}}
+                    <span class="pagination-ellipsis">…</span>
+                    {{else if .Current}}
+                    <span class="pagination-current">{{.Page}}</span>
+                    {{else}}
+                    <a href="/cadastros/negocios/{{$.Data.Negocio.Codigo}}/edit?unidades_page={{.Page}}" class="pagination-btn">{{.Page}}</a>
+                    {{end}}
+                    {{end}}
+                    <a href="/cadastros/negocios/{{.Data.Negocio.Codigo}}/edit?unidades_page={{.Data.UniPagination.NextPage}}"
+                        class="pagination-btn {{if not .Data.UniPagination.HasNext}}pagination-btn-disabled{{end}}">
+                        Próxima
+                    </a>
+                </div>
+            </div>
+            {{else}}
+            <div class="p-8 text-center text-slate-400 italic text-sm">Nenhuma unidade cadastrada para este negócio.</div>
+            {{end}}
+        </div>
+    </div>
+    {{end}}
 </div>
 {{end}}

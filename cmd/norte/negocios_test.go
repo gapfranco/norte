@@ -115,15 +115,14 @@ func TestNegociosUnidadesCRUD(t *testing.T) {
 		t.Fatal("esperava estado vazio de negócios")
 	}
 
-	// Cria negócio.
+	// Cria negócio com CNPJ válido.
 	_, body = mustGet(t, client, srv.URL+"/cadastros/negocios/new")
 	token := mustCSRF(t, body)
 	if resp := mustPost(t, client, srv.URL+"/cadastros/negocios/new", url.Values{
-		"csrf_token":    {token},
-		"nome":          {"Acme Comércio LTDA"},
-		"nome_fantasia": {"Acme"},
-		"documento":     {"12.345.678/0001-90"},
-		"ativo":         {"true"},
+		"csrf_token": {token},
+		"codigo":     {"ACME"},
+		"nome":       {"Acme Comércio LTDA"},
+		"cnpj":       {"11.444.777/0001-61"},
 	}); resp.StatusCode != http.StatusSeeOther {
 		t.Fatalf("cria negócio %d", resp.StatusCode)
 	}
@@ -132,20 +131,24 @@ func TestNegociosUnidadesCRUD(t *testing.T) {
 	if resp.StatusCode != 200 || !strings.Contains(body, "Acme Comércio LTDA") {
 		t.Fatalf("negócio não apareceu na lista: %d", resp.StatusCode)
 	}
+	if !strings.Contains(body, "ACME") {
+		t.Fatal("código do negócio não apareceu na lista")
+	}
 
-	// Descobre o ID do negócio recém-criado pela URL de edição no HTML.
-	negocioID := extractID(t, body, `/cadastros/negocios/(\d+)/edit`)
-
-	// Edita negócio.
-	editURL := srv.URL + "/cadastros/negocios/" + negocioID + "/edit"
-	_, body = mustGet(t, client, editURL)
+	// Edita negócio (unidades embutidas no form de edição).
+	editURL := srv.URL + "/cadastros/negocios/ACME/edit"
+	resp, body = mustGet(t, client, editURL)
+	if resp.StatusCode != 200 {
+		t.Fatalf("edit negócio %d", resp.StatusCode)
+	}
+	if !strings.Contains(body, "Nenhuma unidade cadastrada") {
+		t.Fatal("esperava seção de unidades vazia no form de edição")
+	}
 	token = mustCSRF(t, body)
 	if resp := mustPost(t, client, editURL, url.Values{
-		"csrf_token":    {token},
-		"nome":          {"Acme Comércio S.A."},
-		"nome_fantasia": {"Acme"},
-		"documento":     {"12.345.678/0001-90"},
-		"ativo":         {"true"},
+		"csrf_token": {token},
+		"nome":       {"Acme Comércio S.A."},
+		"cnpj":       {"11.444.777/0001-61"},
 	}); resp.StatusCode != http.StatusSeeOther {
 		t.Fatalf("edita negócio %d", resp.StatusCode)
 	}
@@ -154,55 +157,97 @@ func TestNegociosUnidadesCRUD(t *testing.T) {
 		t.Fatal("edição do negócio não refletiu na lista")
 	}
 
-	// Cria unidade sob o negócio.
-	unidadesURL := srv.URL + "/cadastros/negocios/" + negocioID + "/unidades"
-	resp, body = mustGet(t, client, unidadesURL)
-	if resp.StatusCode != 200 || !strings.Contains(body, "Nenhuma unidade cadastrada") {
-		t.Fatalf("lista de unidades inicial inesperada: %d", resp.StatusCode)
-	}
-	_, body = mustGet(t, client, unidadesURL+"/new")
+	// Cria unidade a partir do formulário de edição.
+	unidadeNewURL := srv.URL + "/cadastros/negocios/ACME/unidades/new"
+	_, body = mustGet(t, client, unidadeNewURL)
 	token = mustCSRF(t, body)
-	if resp := mustPost(t, client, unidadesURL+"/new", url.Values{
+	if resp := mustPost(t, client, unidadeNewURL, url.Values{
 		"csrf_token": {token},
-		"nome":       {"Matriz São Paulo"},
 		"codigo":     {"matriz"},
-		"ativo":      {"true"},
+		"nome":       {"Matriz São Paulo"},
+		"cnpj":       {"04.252.011/0001-10"},
 	}); resp.StatusCode != http.StatusSeeOther {
 		t.Fatalf("cria unidade %d", resp.StatusCode)
 	}
-	resp, body = mustGet(t, client, unidadesURL)
-	if !strings.Contains(body, "Matriz São Paulo") {
-		t.Fatal("unidade não apareceu na lista")
-	}
 
-	// Contagem de unidades reflete na lista de negócios.
-	_, body = mustGet(t, client, srv.URL+"/cadastros/negocios")
-	if !strings.Contains(body, "1 unidade(s)") && !strings.Contains(body, ">1<") {
-		// A contagem aparece na coluna Unidades; garante ao menos que a lista carrega.
-		t.Log("aviso: contagem textual de unidades não localizada no HTML")
+	resp, body = mustGet(t, client, editURL)
+	if !strings.Contains(body, "Matriz São Paulo") {
+		t.Fatal("unidade não apareceu no form de edição do negócio")
+	}
+	if !strings.Contains(body, "04252011000110") {
+		t.Fatal("CNPJ da unidade não apareceu na listagem embutida")
 	}
 
 	// Exclui unidade.
-	unidadeID := extractID(t, body, `/unidades/(\d+)/edit`)
-	if unidadeID == "" {
-		// Recarrega a lista de unidades para extrair o ID.
-		_, ubody := mustGet(t, client, unidadesURL)
-		unidadeID = extractID(t, ubody, `/unidades/(\d+)/edit`)
+	unidadeEditPath := extractID(t, body, `/unidades/([^/"]+)/edit`)
+	if unidadeEditPath == "" {
+		t.Fatal("não encontrou link de edição da unidade")
 	}
-	if resp := mustPost(t, client, unidadesURL+"/"+unidadeID+"/delete", url.Values{"csrf_token": {token}}); resp.StatusCode != http.StatusSeeOther {
+	if resp := mustPost(t, client, srv.URL+"/cadastros/negocios/ACME/unidades/"+unidadeEditPath+"/delete", url.Values{"csrf_token": {token}}); resp.StatusCode != http.StatusSeeOther {
 		t.Fatalf("exclui unidade %d", resp.StatusCode)
 	}
-	_, body = mustGet(t, client, unidadesURL)
+	_, body = mustGet(t, client, editURL)
 	if strings.Contains(body, "Matriz São Paulo") {
 		t.Fatal("unidade não foi excluída")
 	}
 
 	// Exclui negócio.
-	if resp := mustPost(t, client, srv.URL+"/cadastros/negocios/"+negocioID+"/delete", url.Values{"csrf_token": {token}}); resp.StatusCode != http.StatusSeeOther {
+	if resp := mustPost(t, client, srv.URL+"/cadastros/negocios/ACME/delete", url.Values{"csrf_token": {token}}); resp.StatusCode != http.StatusSeeOther {
 		t.Fatalf("exclui negócio %d", resp.StatusCode)
 	}
 	_, body = mustGet(t, client, srv.URL+"/cadastros/negocios")
 	if strings.Contains(body, "Acme Comércio S.A.") {
 		t.Fatal("negócio não foi excluído")
+	}
+}
+
+func TestNegocioCNPJInvalido(t *testing.T) {
+	srv, client := newAuthedServer(t)
+
+	_, body := mustGet(t, client, srv.URL+"/cadastros/negocios/new")
+	token := mustCSRF(t, body)
+	resp := mustPost(t, client, srv.URL+"/cadastros/negocios/new", url.Values{
+		"csrf_token": {token},
+		"codigo":     {"BAD"},
+		"nome":       {"Negócio Inválido"},
+		"cnpj":       {"12.345.678/0001-90"},
+	})
+	if resp.StatusCode != http.StatusUnprocessableEntity {
+		t.Fatalf("esperava 422 para CNPJ inválido, got %d", resp.StatusCode)
+	}
+	_, body = mustGet(t, client, srv.URL+"/cadastros/negocios")
+	if strings.Contains(body, "Negócio Inválido") {
+		t.Fatal("negócio com CNPJ inválido não deveria ser persistido")
+	}
+}
+
+func TestUnidadeCNPJInvalido(t *testing.T) {
+	srv, client := newAuthedServer(t)
+
+	_, body := mustGet(t, client, srv.URL+"/cadastros/negocios/new")
+	token := mustCSRF(t, body)
+	if resp := mustPost(t, client, srv.URL+"/cadastros/negocios/new", url.Values{
+		"csrf_token": {token},
+		"codigo":     {"ACME"},
+		"nome":       {"Acme"},
+	}); resp.StatusCode != http.StatusSeeOther {
+		t.Fatalf("cria negócio %d", resp.StatusCode)
+	}
+
+	unidadeNewURL := srv.URL + "/cadastros/negocios/ACME/unidades/new"
+	_, body = mustGet(t, client, unidadeNewURL)
+	token = mustCSRF(t, body)
+	resp := mustPost(t, client, unidadeNewURL, url.Values{
+		"csrf_token": {token},
+		"codigo":     {"u1"},
+		"nome":       {"Unidade Inválida"},
+		"cnpj":       {"12.345.678/0001-90"},
+	})
+	if resp.StatusCode != http.StatusUnprocessableEntity {
+		t.Fatalf("esperava 422 para CNPJ inválido na unidade, got %d", resp.StatusCode)
+	}
+	_, body = mustGet(t, client, srv.URL+"/cadastros/negocios/ACME/edit")
+	if strings.Contains(body, "Unidade Inválida") {
+		t.Fatal("unidade com CNPJ inválido não deveria ser persistida")
 	}
 }

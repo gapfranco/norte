@@ -118,13 +118,13 @@
     }
 
     .btn-primary {
-        @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg
+        @apply inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-medium rounded-lg
                bg-navy-600 text-white hover:bg-navy-700
                transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-500 focus-visible:ring-offset-2;
     }
 
     .btn-secondary {
-        @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg
+        @apply inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-medium rounded-lg
                bg-white border border-slate-300 text-slate-700 hover:bg-slate-50
                transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-500 focus-visible:ring-offset-2;
     }

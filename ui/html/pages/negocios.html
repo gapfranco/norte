@@ -1,85 +1,64 @@
 {{define "main"}}
 <div class="page-list-wide">
-    <div class="page-toolbar">
-        <h2 class="text-xl font-semibold text-slate-900">Negócios</h2>
+    <header class="page-header flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <p class="page-header-eyebrow">Cadastros</p>
+            <h1 class="page-header-title">Negócios</h1>
+            <p class="page-header-desc">Gerencie negócios e unidades do grupo.</p>
+        </div>
         <a href="/cadastros/negocios/new" class="btn-primary w-full sm:w-auto">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             Novo Negócio
         </a>
-    </div>
+    </header>
 
-    <form method="GET" action="/cadastros/negocios" class="filter-bar">
-        <input type="text" name="nome" value="{{.Data.FilterNome}}" placeholder="Filtrar por nome..."
-            class="form-control">
-        <button type="submit" class="btn-primary w-full sm:w-auto">
-            Buscar
-        </button>
-        {{if .Data.FilterNome}}
-        <a href="/cadastros/negocios" class="btn-secondary w-full sm:w-auto">
-            Limpar
-        </a>
-        {{end}}
-    </form>
+    <div class="filter-card">
+        <p class="filter-card-title">Filtros</p>
+        <form method="GET" action="/cadastros/negocios" class="grid grid-cols-1 gap-3 sm:grid-cols-[10rem_minmax(12rem,1fr)_14rem_auto_auto] sm:items-end">
+            <div>
+                <label class="block text-sm font-medium text-slate-800 mb-1">Código</label>
+                <input type="text" name="codigo" value="{{.Data.FilterCodigo}}" placeholder="Filtrar por código..."
+                    class="form-control">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-800 mb-1">Nome</label>
+                <input type="text" name="nome" value="{{.Data.FilterNome}}" placeholder="Filtrar por nome..."
+                    class="form-control">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-800 mb-1">CNPJ</label>
+                <input type="text" name="cnpj" value="{{.Data.FilterCNPJ}}" placeholder="Filtrar por CNPJ..."
+                    class="form-control">
+            </div>
+            <button type="submit" class="btn-primary">Buscar</button>
+            {{if or .Data.FilterCodigo .Data.FilterNome .Data.FilterCNPJ}}
+            <a href="/cadastros/negocios" class="btn-secondary">Limpar</a>
+            {{end}}
+        </form>
+    </div>
 
     <div class="table-card">
         {{if .Data.Negocios}}
-        <div class="mobile-card-list">
-            {{range .Data.Negocios}}
-            <div class="mobile-card">
-                <div class="min-w-0">
-                    <p class="mobile-card-title truncate">
-                        {{.Nome}}
-                        {{if not .Ativo}}<span class="ml-1 badge badge-muted">Inativo</span>{{end}}
-                    </p>
-                    <p class="mobile-card-meta">
-                        {{if .NomeFantasia}}<span>{{.NomeFantasia}}</span>{{end}}
-                        {{if .Documento}}<span>{{.Documento}}</span>{{end}}
-                        <span>{{.Unidades}} unidade(s)</span>
-                    </p>
-                </div>
-                <div class="mobile-card-actions">
-                    <a href="/cadastros/negocios/{{.ID}}/unidades" class="btn-ghost btn-sm">Unidades</a>
-                    <a href="/cadastros/negocios/{{.ID}}/edit" class="btn-ghost btn-sm">Alterar</a>
-                    <form action="/cadastros/negocios/{{.ID}}/delete" method="POST" onsubmit="return confirm('Confirma a exclusão do negócio {{.Nome}} e suas unidades?')">
-                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
-                        <button type="submit" class="btn-danger btn-sm">Excluir</button>
-                    </form>
-                </div>
-            </div>
-            {{end}}
-        </div>
-
-        <div class="hidden sm:block table-scroll">
-        <table class="list-table">
-            <thead class="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+        <div class="table-scroll">
+        <table class="data-table">
+            <thead class="data-table-head">
                 <tr>
-                    <th class="px-6 py-3">Nome</th>
-                    <th class="px-6 py-3">Nome fantasia</th>
-                    <th class="px-6 py-3">Documento</th>
-                    <th class="px-6 py-3 text-center">Unidades</th>
-                    <th class="px-6 py-3 text-center">Situação</th>
-                    <th class="px-6 py-3 text-right">Ações</th>
+                    <th scope="col">Código</th>
+                    <th scope="col">Nome / Razão Social</th>
+                    <th scope="col">CNPJ</th>
+                    <th scope="col" class="text-right">Ações</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
                 {{range .Data.Negocios}}
-                <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="px-6 py-4 font-medium text-slate-800">{{.Nome}}</td>
-                    <td class="px-6 py-4 text-slate-700">{{if .NomeFantasia}}{{.NomeFantasia}}{{else}}<span class="text-slate-300">—</span>{{end}}</td>
-                    <td class="px-6 py-4 text-slate-700">{{if .Documento}}{{.Documento}}{{else}}<span class="text-slate-300">—</span>{{end}}</td>
-                    <td class="px-6 py-4 text-center text-slate-700">{{.Unidades}}</td>
-                    <td class="px-6 py-4 text-center">
-                        {{if .Ativo}}
-                        <span class="badge badge-success">Ativo</span>
-                        {{else}}
-                        <span class="badge badge-muted">Inativo</span>
-                        {{end}}
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        <div class="inline-flex items-center gap-2">
-                            <a href="/cadastros/negocios/{{.ID}}/unidades" class="btn-ghost btn-sm">Unidades</a>
-                            <a href="/cadastros/negocios/{{.ID}}/edit" class="btn-ghost btn-sm">Alterar</a>
-                            <form action="/cadastros/negocios/{{.ID}}/delete" method="POST" onsubmit="return confirm('Confirma a exclusão do negócio {{.Nome}} e suas unidades?')">
+                <tr class="data-table-row">
+                    <td class="font-medium text-slate-800">{{.Codigo}}</td>
+                    <td class="text-slate-700">{{.Nome}}</td>
+                    <td class="text-slate-600">{{.CNPJ}}</td>
+                    <td class="text-right">
+                        <div class="inline-flex items-center gap-1">
+                            <a href="/cadastros/negocios/{{.Codigo}}/edit" class="btn-ghost btn-sm">Alterar</a>
+                            <form action="/cadastros/negocios/{{.Codigo}}/delete" method="POST" onsubmit="return confirm('Confirma a exclusão do negócio {{.Codigo}}?')">
                                 <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
                                 <button type="submit" class="btn-danger btn-sm">Excluir</button>
                             </form>
@@ -93,10 +72,10 @@
 
         <div class="pagination-bar">
             <div>
-                Mostrando <span class="font-bold">{{len .Data.Negocios}}</span> de <span class="font-bold">{{.Data.Pagination.TotalItems}}</span> registros
+                Mostrando <span class="font-semibold">{{len .Data.Negocios}}</span> de <span class="font-semibold">{{.Data.Pagination.TotalItems}}</span> registros
             </div>
             <div class="pagination-pages">
-                <a href="/cadastros/negocios?page={{.Data.Pagination.PrevPage}}&nome={{.Data.FilterNome}}"
+                <a href="/cadastros/negocios?page={{.Data.Pagination.PrevPage}}&codigo={{.Data.FilterCodigo}}&nome={{.Data.FilterNome}}&cnpj={{.Data.FilterCNPJ}}"
                     class="pagination-btn {{if not .Data.Pagination.HasPrev}}pagination-btn-disabled{{end}}">
                     Anterior
                 </a>
@@ -106,19 +85,21 @@
                 {{else if .Current}}
                 <span class="pagination-current">{{.Page}}</span>
                 {{else}}
-                <a href="/cadastros/negocios?page={{.Page}}&nome={{$.Data.FilterNome}}" class="pagination-btn">{{.Page}}</a>
+                <a href="/cadastros/negocios?page={{.Page}}&codigo={{$.Data.FilterCodigo}}&nome={{$.Data.FilterNome}}&cnpj={{$.Data.FilterCNPJ}}" class="pagination-btn">{{.Page}}</a>
                 {{end}}
                 {{end}}
-                <a href="/cadastros/negocios?page={{.Data.Pagination.NextPage}}&nome={{.Data.FilterNome}}"
+                <a href="/cadastros/negocios?page={{.Data.Pagination.NextPage}}&codigo={{.Data.FilterCodigo}}&nome={{.Data.FilterNome}}&cnpj={{.Data.FilterCNPJ}}"
                     class="pagination-btn {{if not .Data.Pagination.HasNext}}pagination-btn-disabled{{end}}">
                     Próxima
                 </a>
             </div>
         </div>
         {{else}}
-        <div class="p-12 text-center text-slate-400 italic">
-            {{if .Data.FilterNome}}Nenhum negócio encontrado para o filtro informado.{{else}}Nenhum negócio cadastrado.{{end}}
-        </div>
+        {{if or .Data.FilterCodigo .Data.FilterNome .Data.FilterCNPJ}}
+        {{template "empty_state" dict "Title" "Nenhum negócio encontrado" "Message" "Tente ajustar os filtros informados."}}
+        {{else}}
+        {{template "empty_state" dict "Title" "Nenhum negócio cadastrado" "Message" "Comece cadastrando o primeiro negócio do grupo." "LinkURL" "/cadastros/negocios/new" "LinkText" "Novo Negócio"}}
+        {{end}}
         {{end}}
     </div>
 </div>

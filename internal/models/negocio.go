@@ -1,20 +1,16 @@
 package models
 
-// Negocio representa uma empresa/entidade organizacional (antigo "Empresa").
+// Negocio representa uma empresa/entidade organizacional.
 type Negocio struct {
-	ID           int
-	Nome         string
-	NomeFantasia string
-	Documento    string
-	Ativo        bool
-	Unidades     int // contagem de unidades vinculadas (uso em listagem)
+	Codigo string
+	Nome   string
+	CNPJ   string
 }
 
 // Unidade representa uma filial/unidade operacional de um Negócio.
 type Unidade struct {
-	ID        int
-	NegocioID int
-	Nome      string
-	Codigo    string
-	Ativo     bool
+	NegocioCodigo string
+	Codigo        string
+	Nome          string
+	CNPJ          string
 }

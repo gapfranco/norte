@@ -9,18 +9,18 @@ import (
 )
 
 const negociosPageSize = 10
+const unidadesPageSize = 10
 
 type negocioForm struct {
-	Nome         string `form:"nome"`
-	NomeFantasia string `form:"nome_fantasia"`
-	Documento    string `form:"documento"`
-	Ativo        bool   `form:"ativo"`
+	Codigo string `form:"codigo"`
+	Nome   string `form:"nome"`
+	CNPJ   string `form:"cnpj"`
 }
 
 type unidadeForm struct {
-	Nome   string `form:"nome"`
 	Codigo string `form:"codigo"`
-	Ativo  bool   `form:"ativo"`
+	Nome   string `form:"nome"`
+	CNPJ   string `form:"cnpj"`
 }
 
 // ─── Negócios ───────────────────────────────────────────────────────────────
@@ -32,9 +32,13 @@ func (app *application) negociosList(w http.ResponseWriter, r *http.Request) {
 			page = v
 		}
 	}
+	filterCodigo := r.URL.Query().Get("codigo")
 	filterNome := r.URL.Query().Get("nome")
+	filterCNPJ := r.URL.Query().Get("cnpj")
+	// CNPJ é persistido normalizado; o filtro ignora pontuação digitada.
+	cnpjQuery := normalizarCNPJ(filterCNPJ)
 
-	negocios, total, err := app.db.ListNegociosFilter(filterNome, negociosPageSize, (page-1)*negociosPageSize)
+	negocios, total, err := app.db.ListNegociosFilter(filterCodigo, filterNome, cnpjQuery, negociosPageSize, (page-1)*negociosPageSize)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -43,13 +47,17 @@ func (app *application) negociosList(w http.ResponseWriter, r *http.Request) {
 	data.ActiveMenu = "cadastros"
 	data.ActiveSubmenu = "negocios"
 	data.Data = struct {
-		Negocios   []models.Negocio
-		Pagination models.PaginationMetadata
-		FilterNome string
+		Negocios     []models.Negocio
+		Pagination   models.PaginationMetadata
+		FilterCodigo string
+		FilterNome   string
+		FilterCNPJ   string
 	}{
-		Negocios:   negocios,
-		Pagination: app.calculatePagination(total, page, negociosPageSize),
-		FilterNome: filterNome,
+		Negocios:     negocios,
+		Pagination:   app.calculatePagination(total, page, negociosPageSize),
+		FilterCodigo: filterCodigo,
+		FilterNome:   filterNome,
+		FilterCNPJ:   filterCNPJ,
 	}
 	app.render(w, r, http.StatusOK, "negocios.html", data)
 }
@@ -61,7 +69,7 @@ func (app *application) negocioNew(w http.ResponseWriter, r *http.Request) {
 	data.Data = struct {
 		EditMode bool
 		Negocio  *models.Negocio
-	}{EditMode: false, Negocio: &models.Negocio{Ativo: true}}
+	}{EditMode: false, Negocio: &models.Negocio{}}
 	app.render(w, r, http.StatusOK, "negocio_form.html", data)
 }
 
@@ -71,15 +79,33 @@ func (app *application) negocioNewPost(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
+	form.Codigo = strings.TrimSpace(form.Codigo)
 	form.Nome = strings.TrimSpace(form.Nome)
-	if form.Nome == "" {
+	form.CNPJ = strings.TrimSpace(form.CNPJ)
+
+	var flashMsg string
+	switch {
+	case form.Codigo == "" || form.Nome == "":
+		flashMsg = "Código e nome são obrigatórios."
+	case !validarCNPJ(form.CNPJ):
+		flashMsg = "CNPJ inválido."
+	}
+	if flashMsg != "" {
 		app.renderNegocioForm(w, r, false, &models.Negocio{
-			Nome: form.Nome, NomeFantasia: form.NomeFantasia, Documento: form.Documento, Ativo: form.Ativo,
-		}, "O nome do negócio é obrigatório.")
+			Codigo: form.Codigo, Nome: form.Nome, CNPJ: form.CNPJ,
+		}, nil, models.PaginationMetadata{}, flashMsg)
 		return
 	}
-	if err := app.db.CreateNegocio(form.Nome, strings.TrimSpace(form.NomeFantasia), strings.TrimSpace(form.Documento), form.Ativo); err != nil {
-		app.serverError(w, r, err)
+
+	cnpj := normalizarCNPJ(form.CNPJ)
+	if err := app.db.CreateNegocio(models.Negocio{Codigo: form.Codigo, Nome: form.Nome, CNPJ: cnpj}); err != nil {
+		msg := "Erro ao criar negócio (código já existe?)."
+		if isCNPJUniqueError(err) {
+			msg = "CNPJ já cadastrado."
+		}
+		app.renderNegocioForm(w, r, false, &models.Negocio{
+			Codigo: form.Codigo, Nome: form.Nome, CNPJ: form.CNPJ,
+		}, nil, models.PaginationMetadata{}, msg)
 		return
 	}
 	app.syncDB(r.Context())
@@ -88,26 +114,23 @@ func (app *application) negocioNewPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) negocioEdit(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil || id < 1 {
-		app.notFound(w)
-		return
-	}
-	negocio, err := app.db.GetNegocio(id)
+	codigo := r.PathValue("codigo")
+	negocio, err := app.db.GetNegocio(codigo)
 	if err != nil {
 		app.notFound(w)
 		return
 	}
-	app.renderNegocioForm(w, r, true, negocio, "")
+	unidades, uniPag, err := app.loadUnidadesPage(codigo, r.URL.Query().Get("unidades_page"))
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+	app.renderNegocioForm(w, r, true, negocio, unidades, uniPag, "")
 }
 
 func (app *application) negocioEditPost(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil || id < 1 {
-		app.notFound(w)
-		return
-	}
-	if _, err := app.db.GetNegocio(id); err != nil {
+	codigo := r.PathValue("codigo")
+	if _, err := app.db.GetNegocio(codigo); err != nil {
 		app.notFound(w)
 		return
 	}
@@ -117,13 +140,30 @@ func (app *application) negocioEditPost(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	form.Nome = strings.TrimSpace(form.Nome)
-	if form.Nome == "" {
-		app.renderNegocioForm(w, r, true, &models.Negocio{
-			ID: id, Nome: form.Nome, NomeFantasia: form.NomeFantasia, Documento: form.Documento, Ativo: form.Ativo,
-		}, "O nome do negócio é obrigatório.")
+	form.CNPJ = strings.TrimSpace(form.CNPJ)
+
+	var flashMsg string
+	switch {
+	case form.Nome == "":
+		flashMsg = "O nome do negócio é obrigatório."
+	case !validarCNPJ(form.CNPJ):
+		flashMsg = "CNPJ inválido."
+	}
+	if flashMsg != "" {
+		negocio := &models.Negocio{Codigo: codigo, Nome: form.Nome, CNPJ: form.CNPJ}
+		unidades, uniPag, _ := app.loadUnidadesPage(codigo, "1")
+		app.renderNegocioForm(w, r, true, negocio, unidades, uniPag, flashMsg)
 		return
 	}
-	if err := app.db.UpdateNegocio(id, form.Nome, strings.TrimSpace(form.NomeFantasia), strings.TrimSpace(form.Documento), form.Ativo); err != nil {
+
+	cnpj := normalizarCNPJ(form.CNPJ)
+	if err := app.db.UpdateNegocio(models.Negocio{Codigo: codigo, Nome: form.Nome, CNPJ: cnpj}); err != nil {
+		if isCNPJUniqueError(err) {
+			negocio := &models.Negocio{Codigo: codigo, Nome: form.Nome, CNPJ: form.CNPJ}
+			unidades, uniPag, _ := app.loadUnidadesPage(codigo, "1")
+			app.renderNegocioForm(w, r, true, negocio, unidades, uniPag, "CNPJ já cadastrado.")
+			return
+		}
 		app.serverError(w, r, err)
 		return
 	}
@@ -133,16 +173,12 @@ func (app *application) negocioEditPost(w http.ResponseWriter, r *http.Request) 
 }
 
 func (app *application) negocioDelete(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil || id < 1 {
+	codigo := r.PathValue("codigo")
+	if _, err := app.db.GetNegocio(codigo); err != nil {
 		app.notFound(w)
 		return
 	}
-	if _, err := app.db.GetNegocio(id); err != nil {
-		app.notFound(w)
-		return
-	}
-	if err := app.db.DeleteNegocio(id); err != nil {
+	if err := app.db.DeleteNegocio(codigo); err != nil {
 		app.serverError(w, r, err)
 		return
 	}
@@ -151,7 +187,12 @@ func (app *application) negocioDelete(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/cadastros/negocios", http.StatusSeeOther)
 }
 
-func (app *application) renderNegocioForm(w http.ResponseWriter, r *http.Request, editMode bool, negocio *models.Negocio, flash string) {
+func (app *application) renderNegocioForm(
+	w http.ResponseWriter, r *http.Request,
+	editMode bool, negocio *models.Negocio,
+	unidades []models.Unidade, uniPag models.PaginationMetadata,
+	flash string,
+) {
 	data := app.newTemplateData(r)
 	data.ActiveMenu = "cadastros"
 	data.ActiveSubmenu = "negocios"
@@ -159,9 +200,16 @@ func (app *application) renderNegocioForm(w http.ResponseWriter, r *http.Request
 		data.Flash = flash
 	}
 	data.Data = struct {
-		EditMode bool
-		Negocio  *models.Negocio
-	}{EditMode: editMode, Negocio: negocio}
+		EditMode      bool
+		Negocio       *models.Negocio
+		Unidades      []models.Unidade
+		UniPagination models.PaginationMetadata
+	}{
+		EditMode:      editMode,
+		Negocio:       negocio,
+		Unidades:      unidades,
+		UniPagination: uniPag,
+	}
 	status := http.StatusOK
 	if flash != "" {
 		status = http.StatusUnprocessableEntity
@@ -169,34 +217,28 @@ func (app *application) renderNegocioForm(w http.ResponseWriter, r *http.Request
 	app.render(w, r, status, "negocio_form.html", data)
 }
 
-// ─── Unidades (escopo de um Negócio) ──────────────────────────────────────────
-
-func (app *application) unidadesList(w http.ResponseWriter, r *http.Request) {
-	negocio, ok := app.negocioFromPath(w, r)
-	if !ok {
-		return
+func (app *application) loadUnidadesPage(negocioCodigo, pageParam string) ([]models.Unidade, models.PaginationMetadata, error) {
+	page := 1
+	if pageParam != "" {
+		if v, err := strconv.Atoi(pageParam); err == nil && v > 0 {
+			page = v
+		}
 	}
-	unidades, err := app.db.ListUnidades(negocio.ID)
+	unidades, total, err := app.db.ListUnidades(negocioCodigo, unidadesPageSize, (page-1)*unidadesPageSize)
 	if err != nil {
-		app.serverError(w, r, err)
-		return
+		return nil, models.PaginationMetadata{}, err
 	}
-	data := app.newTemplateData(r)
-	data.ActiveMenu = "cadastros"
-	data.ActiveSubmenu = "negocios"
-	data.Data = struct {
-		Negocio  *models.Negocio
-		Unidades []models.Unidade
-	}{Negocio: negocio, Unidades: unidades}
-	app.render(w, r, http.StatusOK, "unidades.html", data)
+	return unidades, app.calculatePagination(total, page, unidadesPageSize), nil
 }
+
+// ─── Unidades (escopo de um Negócio) ──────────────────────────────────────────
 
 func (app *application) unidadeNew(w http.ResponseWriter, r *http.Request) {
 	negocio, ok := app.negocioFromPath(w, r)
 	if !ok {
 		return
 	}
-	app.renderUnidadeForm(w, r, false, negocio, &models.Unidade{NegocioID: negocio.ID, Ativo: true}, "")
+	app.renderUnidadeForm(w, r, false, negocio, &models.Unidade{NegocioCodigo: negocio.Codigo}, "")
 }
 
 func (app *application) unidadeNewPost(w http.ResponseWriter, r *http.Request) {
@@ -209,20 +251,42 @@ func (app *application) unidadeNewPost(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
+	form.Codigo = strings.TrimSpace(form.Codigo)
 	form.Nome = strings.TrimSpace(form.Nome)
-	if form.Nome == "" {
+	form.CNPJ = strings.TrimSpace(form.CNPJ)
+
+	var flashMsg string
+	switch {
+	case form.Codigo == "" || form.Nome == "":
+		flashMsg = "Código e nome são obrigatórios."
+	case !validarCNPJ(form.CNPJ):
+		flashMsg = "CNPJ inválido."
+	}
+	if flashMsg != "" {
 		app.renderUnidadeForm(w, r, false, negocio, &models.Unidade{
-			NegocioID: negocio.ID, Nome: form.Nome, Codigo: form.Codigo, Ativo: form.Ativo,
-		}, "O nome da unidade é obrigatório.")
+			NegocioCodigo: negocio.Codigo, Codigo: form.Codigo, Nome: form.Nome, CNPJ: form.CNPJ,
+		}, flashMsg)
 		return
 	}
-	if err := app.db.CreateUnidade(negocio.ID, form.Nome, strings.TrimSpace(form.Codigo), form.Ativo); err != nil {
-		app.serverError(w, r, err)
+
+	cnpj := normalizarCNPJ(form.CNPJ)
+	if err := app.db.CreateUnidade(models.Unidade{
+		NegocioCodigo: negocio.Codigo, Codigo: form.Codigo, Nome: form.Nome, CNPJ: cnpj,
+	}); err != nil {
+		msg := "Erro ao criar unidade (código já existe?)."
+		if isCNPJUniqueError(err) {
+			msg = "CNPJ já cadastrado."
+		} else if isUniqueConstraintError(err) {
+			msg = "Código da unidade já existe neste negócio."
+		}
+		app.renderUnidadeForm(w, r, false, negocio, &models.Unidade{
+			NegocioCodigo: negocio.Codigo, Codigo: form.Codigo, Nome: form.Nome, CNPJ: form.CNPJ,
+		}, msg)
 		return
 	}
 	app.syncDB(r.Context())
 	app.sessionManager.Put(r.Context(), "flash", "Unidade criada com sucesso.")
-	http.Redirect(w, r, "/cadastros/negocios/"+strconv.Itoa(negocio.ID)+"/unidades", http.StatusSeeOther)
+	http.Redirect(w, r, "/cadastros/negocios/"+negocio.Codigo+"/edit", http.StatusSeeOther)
 }
 
 func (app *application) unidadeEdit(w http.ResponseWriter, r *http.Request) {
@@ -230,7 +294,7 @@ func (app *application) unidadeEdit(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	unidade, ok := app.unidadeFromPath(w, r, negocio.ID)
+	unidade, ok := app.unidadeFromPath(w, r, negocio.Codigo)
 	if !ok {
 		return
 	}
@@ -242,7 +306,7 @@ func (app *application) unidadeEditPost(w http.ResponseWriter, r *http.Request) 
 	if !ok {
 		return
 	}
-	unidade, ok := app.unidadeFromPath(w, r, negocio.ID)
+	unidade, ok := app.unidadeFromPath(w, r, negocio.Codigo)
 	if !ok {
 		return
 	}
@@ -252,19 +316,38 @@ func (app *application) unidadeEditPost(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	form.Nome = strings.TrimSpace(form.Nome)
-	if form.Nome == "" {
+	form.CNPJ = strings.TrimSpace(form.CNPJ)
+
+	var flashMsg string
+	switch {
+	case form.Nome == "":
+		flashMsg = "O nome da unidade é obrigatório."
+	case !validarCNPJ(form.CNPJ):
+		flashMsg = "CNPJ inválido."
+	}
+	if flashMsg != "" {
 		app.renderUnidadeForm(w, r, true, negocio, &models.Unidade{
-			ID: unidade.ID, NegocioID: negocio.ID, Nome: form.Nome, Codigo: form.Codigo, Ativo: form.Ativo,
-		}, "O nome da unidade é obrigatório.")
+			NegocioCodigo: negocio.Codigo, Codigo: unidade.Codigo, Nome: form.Nome, CNPJ: form.CNPJ,
+		}, flashMsg)
 		return
 	}
-	if err := app.db.UpdateUnidade(unidade.ID, form.Nome, strings.TrimSpace(form.Codigo), form.Ativo); err != nil {
+
+	cnpj := normalizarCNPJ(form.CNPJ)
+	if err := app.db.UpdateUnidade(models.Unidade{
+		NegocioCodigo: negocio.Codigo, Codigo: unidade.Codigo, Nome: form.Nome, CNPJ: cnpj,
+	}); err != nil {
+		if isCNPJUniqueError(err) {
+			app.renderUnidadeForm(w, r, true, negocio, &models.Unidade{
+				NegocioCodigo: negocio.Codigo, Codigo: unidade.Codigo, Nome: form.Nome, CNPJ: form.CNPJ,
+			}, "CNPJ já cadastrado.")
+			return
+		}
 		app.serverError(w, r, err)
 		return
 	}
 	app.syncDB(r.Context())
 	app.sessionManager.Put(r.Context(), "flash", "Unidade atualizada com sucesso.")
-	http.Redirect(w, r, "/cadastros/negocios/"+strconv.Itoa(negocio.ID)+"/unidades", http.StatusSeeOther)
+	http.Redirect(w, r, "/cadastros/negocios/"+negocio.Codigo+"/edit", http.StatusSeeOther)
 }
 
 func (app *application) unidadeDelete(w http.ResponseWriter, r *http.Request) {
@@ -272,17 +355,17 @@ func (app *application) unidadeDelete(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	unidade, ok := app.unidadeFromPath(w, r, negocio.ID)
+	unidade, ok := app.unidadeFromPath(w, r, negocio.Codigo)
 	if !ok {
 		return
 	}
-	if err := app.db.DeleteUnidade(unidade.ID); err != nil {
+	if err := app.db.DeleteUnidade(negocio.Codigo, unidade.Codigo); err != nil {
 		app.serverError(w, r, err)
 		return
 	}
 	app.syncDB(r.Context())
 	app.sessionManager.Put(r.Context(), "flash", "Unidade excluída.")
-	http.Redirect(w, r, "/cadastros/negocios/"+strconv.Itoa(negocio.ID)+"/unidades", http.StatusSeeOther)
+	http.Redirect(w, r, "/cadastros/negocios/"+negocio.Codigo+"/edit", http.StatusSeeOther)
 }
 
 func (app *application) renderUnidadeForm(w http.ResponseWriter, r *http.Request, editMode bool, negocio *models.Negocio, unidade *models.Unidade, flash string) {
@@ -304,14 +387,14 @@ func (app *application) renderUnidadeForm(w http.ResponseWriter, r *http.Request
 	app.render(w, r, status, "unidade_form.html", data)
 }
 
-// negocioFromPath resolve o {id} da rota para um Negócio, respondendo 404 se inválido.
+// negocioFromPath resolve o {codigo} da rota para um Negócio, respondendo 404 se inválido.
 func (app *application) negocioFromPath(w http.ResponseWriter, r *http.Request) (*models.Negocio, bool) {
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil || id < 1 {
+	codigo := strings.TrimSpace(r.PathValue("codigo"))
+	if codigo == "" {
 		app.notFound(w)
 		return nil, false
 	}
-	negocio, err := app.db.GetNegocio(id)
+	negocio, err := app.db.GetNegocio(codigo)
 	if err != nil {
 		app.notFound(w)
 		return nil, false
@@ -319,15 +402,15 @@ func (app *application) negocioFromPath(w http.ResponseWriter, r *http.Request) 
 	return negocio, true
 }
 
-// unidadeFromPath resolve o {uid} da rota e valida que pertence ao negócio informado.
-func (app *application) unidadeFromPath(w http.ResponseWriter, r *http.Request, negocioID int) (*models.Unidade, bool) {
-	uid, err := strconv.Atoi(r.PathValue("uid"))
-	if err != nil || uid < 1 {
+// unidadeFromPath resolve o {ucodigo} da rota e valida que pertence ao negócio informado.
+func (app *application) unidadeFromPath(w http.ResponseWriter, r *http.Request, negocioCodigo string) (*models.Unidade, bool) {
+	ucodigo := strings.TrimSpace(r.PathValue("ucodigo"))
+	if ucodigo == "" {
 		app.notFound(w)
 		return nil, false
 	}
-	unidade, err := app.db.GetUnidade(uid)
-	if err != nil || unidade.NegocioID != negocioID {
+	unidade, err := app.db.GetUnidade(negocioCodigo, ucodigo)
+	if err != nil {
 		app.notFound(w)
 		return nil, false
 	}

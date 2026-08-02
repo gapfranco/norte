@@ -18,7 +18,7 @@ Desktop e mobile exibem os mesmos itens.
 
 | Item | Status |
 |------|--------|
-| Negócios / Unidades | Em breve |
+| Negócios / Unidades | Implementado |
 | Pessoas | Em breve |
 | Produtos | Em breve |
 | Categorias | Em breve |
