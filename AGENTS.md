@@ -165,3 +165,12 @@ Consulte antes de implementar features novas:
 | `recursos/prd.md` | Visão de produto, roadmap, fases |
 | `recursos/menu.md` | Itens de menu planejados vs. implementados |
 | `README.md` | Setup, build, modos de banco |
+
+## Cursor Cloud specific instructions
+
+Ambiente de desenvolvimento para agentes na nuvem. O update script roda `go mod download` a cada startup; as observações abaixo são caveats não óbvios.
+
+- **Rode em modo headless.** A VM não tem GTK/WebKit; o build/execução desktop (webview, sem build tag) falha. Sempre use a tag `headless`: `go test -tags headless ./...`, `go build -tags headless ./cmd/norte` (ou `make build-server`). O binário resultante fica em `build/norte-server` e sobe em `:4000`.
+- **`norte.conf` é obrigatório e não versionado** (está no `.gitignore`). O default de `DB_MODE` é `remote`, que exige Turso Cloud (`DB_URL`/`DB_TOKEN`) e faz o app abortar no startup sem credenciais. Para dev, mantenha um `norte.conf` na raiz com `DB_MODE=local` e `DB_LOCAL_PATH=local.db` (SQLite puro, sem rede). Este arquivo já existe na VM; recrie-o se sumir.
+- **`tailwindcss` (CLI standalone v4) está instalado em `/usr/local/bin`** e não vem do `go.mod`. É necessário para gerar `ui/static/css/styles.css` (gitignored, mas embutido via `//go:embed "static"`). `make build-server`/`make build` chamam `tailwind-build` automaticamente. O `go build` funciona mesmo sem o CSS (o embed não falha), mas a UI fica sem estilos até rodar `make tailwind-build`.
+- **Executar o servidor de dev:** `./build/norte-server` (ou `go run -tags headless ./cmd/norte -headless`). Não há hot reload; após alterar Go, rebuild. Após alterar classes Tailwind, rode `make tailwind-build`. No primeiro acesso (banco vazio) o app redireciona para `/setup` para criar o admin inicial antes do `/login`.
