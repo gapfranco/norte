@@ -3,7 +3,7 @@
 Espelho do menu da UI (Fase 0). Itens marcados como **Em breve** são stubs navegáveis no dropdown, sem rotas.
 
 ## Cadastros
-- Negócios / Unidades — Em breve
+- **Negócios / Unidades** — implementado (`/cadastros/negocios`)
 - Pessoas — Em breve
 - Produtos — Em breve
 - Categorias — Em breve

@@ -1,0 +1,84 @@
+{{define "main"}}
+<div class="page-list-wide">
+    <div class="flex items-center gap-3 mb-1">
+        <a href="/cadastros/negocios" class="text-slate-400 hover:text-slate-700 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <p class="text-sm text-slate-500">Negócios / <span class="font-medium text-slate-700">{{.Data.Negocio.Nome}}</span></p>
+    </div>
+
+    <div class="page-toolbar">
+        <h2 class="text-xl font-semibold text-slate-900">Unidades</h2>
+        <a href="/cadastros/negocios/{{.Data.Negocio.ID}}/unidades/new" class="btn-primary w-full sm:w-auto">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Nova Unidade
+        </a>
+    </div>
+
+    <div class="table-card">
+        {{if .Data.Unidades}}
+        <div class="mobile-card-list">
+            {{range .Data.Unidades}}
+            <div class="mobile-card">
+                <div class="min-w-0">
+                    <p class="mobile-card-title truncate">
+                        {{.Nome}}
+                        {{if not .Ativo}}<span class="ml-1 badge badge-muted">Inativo</span>{{end}}
+                    </p>
+                    {{if .Codigo}}<p class="mobile-card-meta"><span>Código: {{.Codigo}}</span></p>{{end}}
+                </div>
+                <div class="mobile-card-actions">
+                    <a href="/cadastros/negocios/{{$.Data.Negocio.ID}}/unidades/{{.ID}}/edit" class="btn-ghost btn-sm">Alterar</a>
+                    <form action="/cadastros/negocios/{{$.Data.Negocio.ID}}/unidades/{{.ID}}/delete" method="POST" onsubmit="return confirm('Confirma a exclusão da unidade {{.Nome}}?')">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                        <button type="submit" class="btn-danger btn-sm">Excluir</button>
+                    </form>
+                </div>
+            </div>
+            {{end}}
+        </div>
+
+        <div class="hidden sm:block table-scroll">
+        <table class="list-table">
+            <thead class="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+                <tr>
+                    <th class="px-6 py-3">Nome</th>
+                    <th class="px-6 py-3">Código</th>
+                    <th class="px-6 py-3 text-center">Situação</th>
+                    <th class="px-6 py-3 text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {{range .Data.Unidades}}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 font-medium text-slate-800">{{.Nome}}</td>
+                    <td class="px-6 py-4 text-slate-700">{{if .Codigo}}{{.Codigo}}{{else}}<span class="text-slate-300">—</span>{{end}}</td>
+                    <td class="px-6 py-4 text-center">
+                        {{if .Ativo}}
+                        <span class="badge badge-success">Ativo</span>
+                        {{else}}
+                        <span class="badge badge-muted">Inativo</span>
+                        {{end}}
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="inline-flex items-center gap-2">
+                            <a href="/cadastros/negocios/{{$.Data.Negocio.ID}}/unidades/{{.ID}}/edit" class="btn-ghost btn-sm">Alterar</a>
+                            <form action="/cadastros/negocios/{{$.Data.Negocio.ID}}/unidades/{{.ID}}/delete" method="POST" onsubmit="return confirm('Confirma a exclusão da unidade {{.Nome}}?')">
+                                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                                <button type="submit" class="btn-danger btn-sm">Excluir</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+        </div>
+        {{else}}
+        <div class="p-12 text-center text-slate-400 italic">
+            Nenhuma unidade cadastrada para este negócio.
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}

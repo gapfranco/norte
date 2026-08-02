@@ -86,6 +86,8 @@ func menuFromPath(path string) (menu, submenu string) {
 		return "", ""
 	case strings.HasPrefix(path, "/painel"):
 		return "painel", ""
+	case strings.HasPrefix(path, "/cadastros/negocios"):
+		return "cadastros", "negocios"
 	case strings.HasPrefix(path, "/config/usuarios"):
 		return "config", "usuarios"
 	case strings.HasPrefix(path, "/config/senha"):

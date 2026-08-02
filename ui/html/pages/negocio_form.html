@@ -1,0 +1,52 @@
+{{define "main"}}
+<div class="page-form">
+    <div class="flex items-center gap-3 mb-6">
+        <a href="/cadastros/negocios" class="text-slate-400 hover:text-slate-700 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <h2 class="text-xl font-semibold text-slate-900">
+            {{if .Data.EditMode}}Alterar Negócio{{else}}Novo Negócio{{end}}
+        </h2>
+    </div>
+
+    <div class="form-card">
+        <form action="{{if .Data.EditMode}}/cadastros/negocios/{{.Data.Negocio.ID}}/edit{{else}}/cadastros/negocios/new{{end}}" method="POST" class="space-y-5">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+            <div>
+                <label for="nome" class="block text-sm font-medium text-slate-800 mb-1">Nome</label>
+                <input type="text" id="nome" name="nome" value="{{.Data.Negocio.Nome}}" required autofocus
+                    class="form-control">
+            </div>
+
+            <div>
+                <label for="nome_fantasia" class="block text-sm font-medium text-slate-800 mb-1">Nome fantasia</label>
+                <input type="text" id="nome_fantasia" name="nome_fantasia" value="{{.Data.Negocio.NomeFantasia}}"
+                    class="form-control">
+            </div>
+
+            <div>
+                <label for="documento" class="block text-sm font-medium text-slate-800 mb-1">CNPJ / CPF</label>
+                <input type="text" id="documento" name="documento" value="{{.Data.Negocio.Documento}}"
+                    class="form-control">
+                <p class="mt-1 text-xs text-slate-400">Opcional.</p>
+            </div>
+
+            <label class="flex items-center gap-2 text-sm font-medium text-slate-800">
+                <input type="checkbox" name="ativo" value="true" {{if .Data.Negocio.Ativo}}checked{{end}}
+                    class="h-4 w-4 rounded border-slate-300 text-navy-600 focus:ring-navy-500">
+                Negócio ativo
+            </label>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    {{if .Data.EditMode}}Salvar{{else}}Criar Negócio{{end}}
+                </button>
+                <a href="/cadastros/negocios" class="btn-secondary">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{{end}}

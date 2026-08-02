@@ -9,7 +9,7 @@
             <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </button>
         <div id="menu-cadastros" class="dropdown-menu nav-dropdown hidden w-56">
-            <span class="nav-dropdown-item-disabled">Negócios / Unidades <span class="badge badge-muted">Em breve</span></span>
+            <a href="/cadastros/negocios" class="nav-dropdown-item {{if eq .ActiveSubmenu "negocios"}}nav-dropdown-item-active{{end}}">Negócios / Unidades</a>
             <span class="nav-dropdown-item-disabled">Pessoas <span class="badge badge-muted">Em breve</span></span>
             <span class="nav-dropdown-item-disabled">Produtos <span class="badge badge-muted">Em breve</span></span>
             <span class="nav-dropdown-item-disabled">Categorias <span class="badge badge-muted">Em breve</span></span>
@@ -112,7 +112,7 @@
 
 {{define "nav_mobile"}}
 <p class="nav-mobile-section">Cadastros</p>
-<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Negócios / Unidades <span class="badge badge-muted">Em breve</span></span>
+<a href="/cadastros/negocios" class="nav-mobile-link {{if eq .ActiveSubmenu "negocios"}}nav-mobile-link-active{{end}}">Negócios / Unidades</a>
 <span class="nav-mobile-link text-slate-400 cursor-not-allowed">Pessoas <span class="badge badge-muted">Em breve</span></span>
 <span class="nav-mobile-link text-slate-400 cursor-not-allowed">Produtos <span class="badge badge-muted">Em breve</span></span>
 <span class="nav-mobile-link text-slate-400 cursor-not-allowed">Categorias <span class="badge badge-muted">Em breve</span></span>

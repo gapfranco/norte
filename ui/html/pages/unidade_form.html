@@ -1,0 +1,49 @@
+{{define "main"}}
+<div class="page-form">
+    <div class="flex items-center gap-3 mb-6">
+        <a href="/cadastros/negocios/{{.Data.Negocio.ID}}/unidades" class="text-slate-400 hover:text-slate-700 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <div>
+            <h2 class="text-xl font-semibold text-slate-900">
+                {{if .Data.EditMode}}Alterar Unidade{{else}}Nova Unidade{{end}}
+            </h2>
+            <p class="text-sm text-slate-500">{{.Data.Negocio.Nome}}</p>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <form action="{{if .Data.EditMode}}/cadastros/negocios/{{.Data.Negocio.ID}}/unidades/{{.Data.Unidade.ID}}/edit{{else}}/cadastros/negocios/{{.Data.Negocio.ID}}/unidades/new{{end}}" method="POST" class="space-y-5">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+            <div>
+                <label for="nome" class="block text-sm font-medium text-slate-800 mb-1">Nome</label>
+                <input type="text" id="nome" name="nome" value="{{.Data.Unidade.Nome}}" required autofocus
+                    class="form-control">
+            </div>
+
+            <div>
+                <label for="codigo" class="block text-sm font-medium text-slate-800 mb-1">Código</label>
+                <input type="text" id="codigo" name="codigo" value="{{.Data.Unidade.Codigo}}"
+                    class="form-control">
+                <p class="mt-1 text-xs text-slate-400">Opcional. Ex.: matriz, filial-01.</p>
+            </div>
+
+            <label class="flex items-center gap-2 text-sm font-medium text-slate-800">
+                <input type="checkbox" name="ativo" value="true" {{if .Data.Unidade.Ativo}}checked{{end}}
+                    class="h-4 w-4 rounded border-slate-300 text-navy-600 focus:ring-navy-500">
+                Unidade ativa
+            </label>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    {{if .Data.EditMode}}Salvar{{else}}Criar Unidade{{end}}
+                </button>
+                <a href="/cadastros/negocios/{{.Data.Negocio.ID}}/unidades" class="btn-secondary">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{{end}}
