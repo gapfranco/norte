@@ -1,0 +1,62 @@
+{{define "main"}}
+<div class="page-form">
+    <div class="flex items-center gap-3 mb-6">
+        <a href="/cadastros/categorias" class="text-slate-400 hover:text-slate-700"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></a>
+        <h2 class="text-xl font-semibold text-slate-900">{{if .Data.EditMode}}Alterar{{else}}Nova{{end}} Categoria</h2>
+    </div>
+    {{if .Flash}}<div class="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-sm">{{.Flash}}</div>{{end}}
+    <div class="form-card">
+        <form action="{{if .Data.EditMode}}/cadastros/categorias/{{.Data.Categoria.Codigo}}/edit{{else}}/cadastros/categorias/new{{end}}" method="POST" class="space-y-5">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+            <div>
+                <label class="block text-sm font-medium text-slate-800 mb-1">Código</label>
+                {{if .Data.EditMode}}
+                <input type="text" value="{{.Data.Categoria.Codigo}}" disabled class="form-control text-slate-400">
+                {{else}}
+                <input type="text" name="codigo" value="{{with .Data.Categoria}}{{.Codigo}}{{end}}" required class="form-control">
+                {{end}}
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-800 mb-1">Tipo</label>
+                    <select name="tipo" id="sel-tipo" required class="form-control" onchange="toggleClasse()">
+                        <option value="E" {{with .Data.Categoria}}{{if eq .Tipo "E"}}selected{{end}}{{end}}>Entrada (E)</option>
+                        <option value="S" {{with .Data.Categoria}}{{if eq .Tipo "S"}}selected{{end}}{{end}}>Saída (S)</option>
+                    </select>
+                </div>
+                <div id="classe-wrap">
+                    <label class="block text-sm font-medium text-slate-800 mb-1">Classe</label>
+                    <select name="classe" id="sel-classe" class="form-control">
+                        <option value="">Selecione...</option>
+                        {{range .Data.Classes}}
+                        <option value="{{.}}" {{if $.Data.Categoria}}{{if eq $.Data.Categoria.Classe .}}selected{{end}}{{end}}>{{.}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Salvar</button>
+                <a href="/cadastros/categorias" class="btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+function toggleClasse() {
+    var tipo = document.getElementById('sel-tipo').value;
+    var wrap = document.getElementById('classe-wrap');
+    var sel = document.getElementById('sel-classe');
+    if (tipo === 'S') {
+        wrap.style.display = '';
+        sel.disabled = false;
+        sel.required = true;
+    } else {
+        wrap.style.display = 'none';
+        sel.disabled = true;
+        sel.required = false;
+        sel.value = '';
+    }
+}
+toggleClasse();
+</script>
+{{end}}

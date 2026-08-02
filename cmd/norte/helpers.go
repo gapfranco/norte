@@ -16,6 +16,14 @@ import (
 	"github.com/justinas/nosurf"
 )
 
+func isFKError(err error) bool {
+	if err == nil {
+		return false
+	}
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "foreign key constraint")
+}
+
 func isUniqueConstraintError(err error) bool {
 	if err == nil {
 		return false
@@ -104,6 +112,12 @@ func menuFromPath(path string) (menu, submenu string) {
 		return "painel", ""
 	case strings.HasPrefix(path, "/cadastros/negocios"):
 		return "cadastros", "negocios"
+	case strings.HasPrefix(path, "/cadastros/bancos"):
+		return "cadastros", "bancos"
+	case strings.HasPrefix(path, "/cadastros/contas"):
+		return "cadastros", "contas"
+	case strings.HasPrefix(path, "/cadastros/categorias"):
+		return "cadastros", "categorias"
 	case strings.HasPrefix(path, "/config/usuarios"):
 		return "config", "usuarios"
 	case strings.HasPrefix(path, "/config/senha"):

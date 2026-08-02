@@ -1,0 +1,73 @@
+{{define "main"}}
+<div class="page-list">
+    <div class="page-toolbar">
+        <h2 class="text-xl font-semibold text-slate-900">Categorias</h2>
+        <a href="/cadastros/categorias/new" class="btn-primary w-full sm:w-auto">Nova Categoria</a>
+    </div>
+    <form method="GET" action="/cadastros/categorias" class="filter-bar">
+        <input type="text" name="codigo" value="{{.Data.FilterCodigo}}" placeholder="Código" class="form-control sm:!flex-none sm:!w-32">
+        <select name="tipo" class="form-control sm:!flex-none sm:!w-auto">
+            <option value="">Tipo</option>
+            <option value="E" {{if eq .Data.FilterTipo "E"}}selected{{end}}>Entrada</option>
+            <option value="S" {{if eq .Data.FilterTipo "S"}}selected{{end}}>Saída</option>
+        </select>
+        <button type="submit" class="btn-primary w-full sm:w-auto">Buscar</button>
+        {{if or .Data.FilterCodigo .Data.FilterTipo}}
+        <a href="/cadastros/categorias" class="btn-secondary w-full sm:w-auto">Limpar</a>
+        {{end}}
+    </form>
+    <div class="table-card">
+        {{if .Data.Categorias}}
+        <div class="table-scroll">
+        <table class="list-table">
+            <thead class="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+                <tr><th class="px-6 py-3">Código</th><th class="px-6 py-3">Tipo</th><th class="px-6 py-3">Classe</th><th class="px-6 py-3 text-right">Ações</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {{range .Data.Categorias}}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 font-medium text-slate-800">{{.Codigo}}</td>
+                    <td class="px-6 py-4 text-slate-700">{{if eq .Tipo "E"}}Entrada{{else}}Saída{{end}}</td>
+                    <td class="px-6 py-4 text-slate-500">{{if .Classe}}{{.Classe}}{{else}}—{{end}}</td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="inline-flex items-center gap-2">
+                            <a href="/cadastros/categorias/{{.Codigo}}/edit" class="btn-ghost btn-sm">Alterar</a>
+                            <form action="/cadastros/categorias/{{.Codigo}}/delete" method="POST" class="inline" onsubmit="return confirm('Excluir categoria {{.Codigo}}?')">
+                                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                                <button type="submit" class="btn-danger btn-sm">Excluir</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+        </div>
+        <div class="pagination-bar">
+            <div>
+                Mostrando <span class="font-semibold">{{len .Data.Categorias}}</span> de <span class="font-semibold">{{.Data.Pagination.TotalItems}}</span> registros
+            </div>
+            <div class="pagination-pages">
+                <a href="/cadastros/categorias?page={{.Data.Pagination.PrevPage}}&codigo={{.Data.FilterCodigo}}&tipo={{.Data.FilterTipo}}"
+                    class="pagination-btn {{if not .Data.Pagination.HasPrev}}pagination-btn-disabled{{end}}">
+                    Anterior
+                </a>
+                {{range .Data.Pagination.Pages}}
+                {{if .Ellipsis}}
+                <span class="pagination-ellipsis">…</span>
+                {{else if .Current}}
+                <span class="pagination-current">{{.Page}}</span>
+                {{else}}
+                <a href="/cadastros/categorias?page={{.Page}}&codigo={{$.Data.FilterCodigo}}&tipo={{$.Data.FilterTipo}}" class="pagination-btn">{{.Page}}</a>
+                {{end}}
+                {{end}}
+                <a href="/cadastros/categorias?page={{.Data.Pagination.NextPage}}&codigo={{.Data.FilterCodigo}}&tipo={{.Data.FilterTipo}}"
+                    class="pagination-btn {{if not .Data.Pagination.HasNext}}pagination-btn-disabled{{end}}">
+                    Próxima
+                </a>
+            </div>
+        </div>
+        {{else}}<div class="p-12 text-center text-slate-400 italic">Nenhuma categoria cadastrada.</div>{{end}}
+    </div>
+</div>
+{{end}}

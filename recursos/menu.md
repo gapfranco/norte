@@ -21,9 +21,9 @@ Desktop e mobile exibem os mesmos itens.
 | Negócios / Unidades | Implementado |
 | Pessoas | Em breve |
 | Produtos | Em breve |
-| Categorias | Em breve |
-| Bancos | Em breve |
-| Contas | Em breve |
+| Categorias | Implementado |
+| Bancos | Implementado |
+| Contas | Implementado |
 
 ## Compras
 

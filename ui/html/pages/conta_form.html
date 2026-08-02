@@ -1,0 +1,127 @@
+{{define "main"}}
+<div class="page-form-md">
+    <div class="flex items-center gap-3 mb-6">
+        <a href="/cadastros/contas" class="text-slate-700 hover:text-slate-900 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <h2 class="text-xl font-semibold text-slate-900">
+            {{if .Data.EditMode}}Alterar Conta{{else}}Nova Conta{{end}}
+        </h2>
+    </div>
+
+    {{if .Flash}}
+    <div class="mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">{{.Flash}}</div>
+    {{end}}
+
+    {{if .Data.EditMode}}
+    <form action="/cadastros/contas/{{.Data.Conta.Banco}}/{{.Data.Conta.Conta}}/edit" method="POST" class="form-card space-y-4">
+    {{else}}
+    <form action="/cadastros/contas/new" method="POST" class="form-card space-y-4">
+    {{end}}
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+        <div>
+            <label class="block text-sm font-medium text-slate-800 mb-1">Banco <span class="text-red-500">*</span></label>
+            {{if .Data.EditMode}}
+            <input type="text" value="{{.Data.Conta.Banco}}" disabled
+                class="form-control">
+            {{else}}
+            <select name="banco" required
+                class="form-control">
+                <option value="">Selecione um banco...</option>
+                {{range .Data.Bancos}}
+                <option value="{{.Codigo}}" {{if and $.Data.Conta (eq $.Data.Conta.Banco .Codigo)}}selected{{end}}>{{.Codigo}} — {{.Nome}}</option>
+                {{end}}
+            </select>
+            {{end}}
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-800 mb-1">Conta <span class="text-red-500">*</span></label>
+                {{if .Data.EditMode}}
+                <input type="text" value="{{.Data.Conta.Conta}}" disabled
+                    class="form-control">
+                {{else}}
+                <input type="text" name="conta" value="{{with .Data.Conta}}{{.Conta}}{{end}}" required maxlength="30" placeholder="ex: 12345-6"
+                    class="form-control">
+                {{end}}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-800 mb-1">Agência</label>
+                <input type="text" name="agencia" value="{{with .Data.Conta}}{{.Agencia}}{{end}}" maxlength="20" placeholder="ex: 1234-5"
+                    class="form-control">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-800 mb-1">Tipo</label>
+            <select name="tipo"
+                class="form-control">
+                <option value=""></option>
+                {{range .Data.Tipos}}
+                <option value="{{.}}" {{if and $.Data.Conta (eq $.Data.Conta.Tipo .)}}selected{{end}}>{{.}}</option>
+                {{end}}
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-800 mb-1">Descrição <span class="text-red-500">*</span></label>
+            <input type="text" name="descricao" value="{{with .Data.Conta}}{{.Descricao}}{{end}}" required maxlength="80" placeholder="Nome amigável da conta"
+                class="form-control">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-800 mb-1">Negócio</label>
+                <select name="negocio_codigo" id="sel-negocio" onchange="filterUnidades()"
+                    class="form-control">
+                    <option value="">— nenhuma —</option>
+                    {{range .Data.Negocios}}
+                    <option value="{{.Codigo}}" {{if and $.Data.Conta (eq $.Data.Conta.NegocioCodigo .Codigo)}}selected{{end}}>{{.Codigo}} — {{.Nome}}</option>
+                    {{end}}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-800 mb-1">Unidade</label>
+                <select name="unidade_codigo" id="sel-unidade"
+                    class="form-control">
+                    <option value="">— nenhuma —</option>
+                    {{range .Data.Unidades}}
+                    <option value="{{.Codigo}}" data-negocio="{{.NegocioCodigo}}"
+                        {{if and $.Data.Conta (eq $.Data.Conta.UnidadeCodigo .Codigo) (eq $.Data.Conta.NegocioCodigo .NegocioCodigo)}}selected{{end}}>
+                        {{.Codigo}} — {{.Nome}}
+                    </option>
+                    {{end}}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                {{if .Data.EditMode}}Salvar alterações{{else}}Criar conta{{end}}
+            </button>
+            <a href="/cadastros/contas" class="btn-secondary">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+function filterUnidades() {
+    var negocio = document.getElementById('sel-negocio').value;
+    var unidadeSel = document.getElementById('sel-unidade');
+    var opts = unidadeSel.querySelectorAll('option[data-negocio]');
+    opts.forEach(function(opt) {
+        opt.hidden = negocio !== '' && opt.dataset.negocio !== negocio;
+    });
+    var selected = unidadeSel.value;
+    if (selected) {
+        var sel = unidadeSel.querySelector('option[value="' + selected + '"][data-negocio]');
+        if (sel && sel.hidden) unidadeSel.value = '';
+    }
+}
+document.addEventListener('DOMContentLoaded', filterUnidades);
+</script>
+{{end}}

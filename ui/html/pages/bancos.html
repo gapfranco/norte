@@ -1,0 +1,88 @@
+{{define "main"}}
+<div class="page-list">
+    <div class="page-toolbar">
+        <h2 class="text-xl font-semibold text-slate-900">Bancos</h2>
+        <a href="/cadastros/bancos/new" class="inline-flex items-center gap-2 btn-primary w-full sm:w-auto">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Novo Banco
+        </a>
+    </div>
+
+    <form method="GET" action="/cadastros/bancos" class="filter-bar">
+        <input type="text" name="codigo" value="{{.Data.FilterCodigo}}" placeholder="Filtrar por código..."
+            class="form-control sm:!flex-none sm:!w-40">
+        <input type="text" name="nome" value="{{.Data.FilterNome}}" placeholder="Filtrar por nome..."
+            class="form-control">
+        <button type="submit" class="btn-primary w-full sm:w-auto">
+            Buscar
+        </button>
+        {{if or .Data.FilterCodigo .Data.FilterNome}}
+        <a href="/cadastros/bancos" class="btn-secondary w-full sm:w-auto">
+            Limpar
+        </a>
+        {{end}}
+    </form>
+
+    <div class="table-card">
+        {{if .Data.Bancos}}
+        <div class="table-scroll">
+        <table class="list-table">
+            <thead class="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+                <tr>
+                    <th class="px-6 py-3 w-28">Código</th>
+                    <th class="px-6 py-3">Nome</th>
+                    <th class="px-6 py-3 text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {{range .Data.Bancos}}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-3 font-medium text-slate-800">{{.Codigo}}</td>
+                    <td class="px-6 py-3 text-slate-700">{{.Nome}}</td>
+                    <td class="px-6 py-3 text-right">
+                        <div class="inline-flex items-center gap-2">
+                            <a href="/cadastros/bancos/{{.Codigo}}/edit" class="btn-ghost btn-sm">Alterar</a>
+                            <form action="/cadastros/bancos/{{.Codigo}}/delete" method="POST" onsubmit="return confirm('Confirma a exclusão do banco {{.Codigo}}?')">
+                                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                                <button type="submit" class="btn-danger btn-sm">Excluir</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+        </div>
+
+        <div class="pagination-bar">
+            <div>
+                Mostrando <span class="font-bold">{{len .Data.Bancos}}</span> de <span class="font-bold">{{.Data.Pagination.TotalItems}}</span> registros
+            </div>
+            <div class="pagination-pages">
+                <a href="/cadastros/bancos?page={{.Data.Pagination.PrevPage}}&codigo={{.Data.FilterCodigo}}&nome={{.Data.FilterNome}}"
+                    class="pagination-btn {{if not .Data.Pagination.HasPrev}}pagination-btn-disabled{{end}}">
+                    Anterior
+                </a>
+                {{range .Data.Pagination.Pages}}
+                {{if .Ellipsis}}
+                <span class="pagination-ellipsis">…</span>
+                {{else if .Current}}
+                <span class="pagination-current">{{.Page}}</span>
+                {{else}}
+                <a href="/cadastros/bancos?page={{.Page}}&codigo={{$.Data.FilterCodigo}}&nome={{$.Data.FilterNome}}" class="pagination-btn">{{.Page}}</a>
+                {{end}}
+                {{end}}
+                <a href="/cadastros/bancos?page={{.Data.Pagination.NextPage}}&codigo={{.Data.FilterCodigo}}&nome={{.Data.FilterNome}}"
+                    class="pagination-btn {{if not .Data.Pagination.HasNext}}pagination-btn-disabled{{end}}">
+                    Próxima
+                </a>
+            </div>
+        </div>
+        {{else}}
+        <div class="p-12 text-center text-slate-400 italic">
+            {{if or .Data.FilterCodigo .Data.FilterNome}}Nenhum banco encontrado para os filtros informados.{{else}}Nenhum banco cadastrado.{{end}}
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}

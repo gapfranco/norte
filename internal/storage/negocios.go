@@ -113,6 +113,27 @@ func (t *TursoDB) ListUnidades(negocioCodigo string, limit, offset int) ([]model
 	return unidades, total, rows.Err()
 }
 
+func (t *TursoDB) ListAllUnidades() ([]models.Unidade, error) {
+	rows, err := t.db.Query(
+		"SELECT negocio_codigo, codigo, nome, cnpj FROM unidades ORDER BY negocio_codigo, codigo",
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var unidades []models.Unidade
+	for rows.Next() {
+		var u models.Unidade
+		var cnpj sql.NullString
+		if err := rows.Scan(&u.NegocioCodigo, &u.Codigo, &u.Nome, &cnpj); err != nil {
+			return nil, err
+		}
+		u.CNPJ = cnpj.String
+		unidades = append(unidades, u)
+	}
+	return unidades, rows.Err()
+}
+
 func (t *TursoDB) GetUnidade(negocioCodigo, codigo string) (*models.Unidade, error) {
 	var u models.Unidade
 	var cnpj sql.NullString

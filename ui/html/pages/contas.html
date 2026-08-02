@@ -1,0 +1,124 @@
+{{define "main"}}
+<div class="page-list-wide">
+    <div class="page-toolbar">
+        <h2 class="text-xl font-semibold text-slate-900">Contas</h2>
+        <a href="/cadastros/contas/new" class="btn-primary w-full sm:w-auto">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Nova Conta
+        </a>
+    </div>
+
+    <form method="GET" action="/cadastros/contas" class="filter-bar">
+        <select name="banco" class="form-control sm:!flex-none sm:!w-56">
+            <option value="">Todos os bancos</option>
+            {{range .Data.Bancos}}
+            <option value="{{.Codigo}}" {{if eq $.Data.FilterBanco .Codigo}}selected{{end}}>{{.Codigo}} — {{.Nome}}</option>
+            {{end}}
+        </select>
+        <input type="text" name="descricao" value="{{.Data.FilterDescricao}}" placeholder="Filtrar por descrição..."
+            class="form-control">
+        <button type="submit" class="btn-primary w-full sm:w-auto">
+            Buscar
+        </button>
+        {{if or .Data.FilterBanco .Data.FilterDescricao}}
+        <a href="/cadastros/contas" class="btn-secondary w-full sm:w-auto">
+            Limpar
+        </a>
+        {{end}}
+    </form>
+
+    <div class="table-card">
+        {{if .Data.Contas}}
+        <div class="mobile-card-list">
+            {{range .Data.Contas}}
+            <div class="mobile-card">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="mobile-card-title truncate">{{if .Descricao}}{{.Descricao}}{{else}}{{.Banco}}/{{.Conta}}{{end}}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">{{.Banco}} · Conta {{.Conta}}</p>
+                    </div>
+                    {{if .Tipo}}<span class="badge badge-muted shrink-0">{{.Tipo}}</span>{{end}}
+                </div>
+                <div class="mobile-card-meta">
+                    {{if .Agencia}}<span>Agência {{.Agencia}}</span>{{end}}
+                    {{if .NegocioCodigo}}<span>{{.NegocioCodigo}}{{if .UnidadeCodigo}} / {{.UnidadeCodigo}}{{end}}</span>{{end}}
+                </div>
+                <div class="mobile-card-actions">
+                    <a href="/cadastros/contas/{{.Banco}}/{{.Conta}}/edit" class="btn-ghost btn-sm">Alterar</a>
+                    <form action="/cadastros/contas/{{.Banco}}/{{.Conta}}/delete" method="POST" onsubmit="return confirm('Confirma a exclusão da conta {{.Conta}}?')">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                        <button type="submit" class="btn-danger btn-sm">Excluir</button>
+                    </form>
+                </div>
+            </div>
+            {{end}}
+        </div>
+        <div class="hidden sm:block table-scroll">
+        <table class="list-table">
+            <thead class="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+                <tr>
+                    <th class="px-4 py-3 w-36">Banco</th>
+                    <th class="px-4 py-3 w-36">Conta</th>
+                    <th class="px-4 py-3 w-28">Agência</th>
+                    <th class="px-4 py-3 w-28">Tipo</th>
+                    <th class="px-4 py-3">Descrição</th>
+                    <th class="px-4 py-3">Negócio</th>
+                    <th class="px-4 py-3 text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {{range .Data.Contas}}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-4 py-3 font-medium text-slate-800">{{.Banco}}</td>
+                    <td class="px-4 py-3 text-slate-700">{{.Conta}}</td>
+                    <td class="px-4 py-3 text-slate-700">{{.Agencia}}</td>
+                    <td class="px-4 py-3 text-slate-700">{{.Tipo}}</td>
+                    <td class="px-4 py-3 text-slate-700">{{.Descricao}}</td>
+                    <td class="px-4 py-3 text-slate-600">{{if .NegocioCodigo}}{{.NegocioCodigo}}{{if .UnidadeCodigo}} / {{.UnidadeCodigo}}{{end}}{{end}}</td>
+                    <td class="px-4 py-3 text-right">
+                        <div class="inline-flex items-center gap-2">
+                            <a href="/cadastros/contas/{{.Banco}}/{{.Conta}}/edit" class="btn-ghost btn-sm">Alterar</a>
+                            <form action="/cadastros/contas/{{.Banco}}/{{.Conta}}/delete" method="POST" onsubmit="return confirm('Confirma a exclusão da conta {{.Conta}}?')">
+                                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                                <button type="submit" class="btn-danger btn-sm">Excluir</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+        </div>
+
+        <div class="pagination-bar">
+            <div>
+                Mostrando <span class="font-bold">{{len .Data.Contas}}</span> de <span class="font-bold">{{.Data.Pagination.TotalItems}}</span> registros
+            </div>
+            <div class="pagination-pages">
+                <a href="/cadastros/contas?page={{.Data.Pagination.PrevPage}}&banco={{.Data.FilterBanco}}&descricao={{.Data.FilterDescricao}}"
+                    class="pagination-btn {{if not .Data.Pagination.HasPrev}}pagination-btn-disabled{{end}}">
+                    Anterior
+                </a>
+                {{range .Data.Pagination.Pages}}
+                {{if .Ellipsis}}
+                <span class="pagination-ellipsis">…</span>
+                {{else if .Current}}
+                <span class="pagination-current">{{.Page}}</span>
+                {{else}}
+                <a href="/cadastros/contas?page={{.Page}}&banco={{$.Data.FilterBanco}}&descricao={{$.Data.FilterDescricao}}" class="pagination-btn">{{.Page}}</a>
+                {{end}}
+                {{end}}
+                <a href="/cadastros/contas?page={{.Data.Pagination.NextPage}}&banco={{.Data.FilterBanco}}&descricao={{.Data.FilterDescricao}}"
+                    class="pagination-btn {{if not .Data.Pagination.HasNext}}pagination-btn-disabled{{end}}">
+                    Próxima
+                </a>
+            </div>
+        </div>
+        {{else}}
+        <div class="p-12 text-center text-slate-400 italic">
+            {{if or .Data.FilterBanco .Data.FilterDescricao}}Nenhuma conta encontrada para os filtros informados.{{else}}Nenhuma conta cadastrada.{{end}}
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}

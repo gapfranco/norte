@@ -1,0 +1,68 @@
+{{define "main"}}
+<div class="page-form">
+    <div class="flex items-center gap-3 mb-6">
+        <a href="/cadastros/bancos" class="text-slate-400 hover:text-slate-700 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <h2 class="text-xl font-semibold text-slate-900">
+            {{if .Data.EditMode}}Alterar Banco{{else}}Novo Banco{{end}}
+        </h2>
+    </div>
+
+    <div class="form-card">
+        {{if .Data.EditMode}}
+        <form action="/cadastros/bancos/{{.Data.Banco.Codigo}}/edit" method="POST" class="space-y-5">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+            <div>
+                <label class="block text-sm font-medium text-slate-800 mb-1">Código</label>
+                <input type="text" value="{{.Data.Banco.Codigo}}" disabled
+                    class="w-32 form-control text-slate-400">
+                <p class="mt-1 text-xs text-slate-400">O código não pode ser alterado.</p>
+            </div>
+
+            <div>
+                <label for="nome" class="block text-sm font-medium text-slate-800 mb-1">Nome</label>
+                <input type="text" id="nome" name="nome" value="{{.Data.Banco.Nome}}" required autofocus
+                    class="form-control">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    Salvar
+                </button>
+                <a href="/cadastros/bancos" class="btn-secondary">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+        {{else}}
+        <form action="/cadastros/bancos/new" method="POST" class="space-y-5">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+            <div>
+                <label for="codigo" class="block text-sm font-medium text-slate-800 mb-1">Código</label>
+                <input type="text" id="codigo" name="codigo" value="{{with .Data.Banco}}{{.Codigo}}{{end}}" required autofocus maxlength="10"
+                    class="w-32 form-control">
+                <p class="mt-1 text-xs text-slate-400">Ex: 001, 033, 341. Não pode ser alterado depois.</p>
+            </div>
+
+            <div>
+                <label for="nome" class="block text-sm font-medium text-slate-800 mb-1">Nome</label>
+                <input type="text" id="nome" name="nome" value="{{with .Data.Banco}}{{.Nome}}{{end}}" required
+                    class="form-control">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    Criar Banco
+                </button>
+                <a href="/cadastros/bancos" class="btn-secondary">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+        {{end}}
+    </div>
+</div>
+{{end}}
