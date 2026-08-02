@@ -1,46 +1,105 @@
 # Menu de Opções — Norte
 
-Espelho do menu da UI (Fase 0). Itens marcados como **Em breve** são stubs navegáveis no dropdown, sem rotas.
+Espelho do menu atual da UI ([`ui/html/partials/nav.html`](../ui/html/partials/nav.html)).
+
+**Fase:** 0 (fundação)  
+**Atualizado:** Agosto/2026
+
+| Status | Significado |
+|--------|-------------|
+| **Implementado** | Item clicável com rota e tela |
+| **Em breve** | Stub no dropdown/drawer (`nav-dropdown-item-disabled` / badge), sem rota |
+
+Desktop e mobile exibem os mesmos itens.
+
+---
 
 ## Cadastros
-- Negócios / Unidades — Em breve
-- Pessoas — Em breve
-- Produtos — Em breve
-- Categorias — Em breve
-- Bancos — Em breve
-- Contas — Em breve
+
+| Item | Status |
+|------|--------|
+| Negócios / Unidades | Em breve |
+| Pessoas | Em breve |
+| Produtos | Em breve |
+| Categorias | Em breve |
+| Bancos | Em breve |
+| Contas | Em breve |
 
 ## Compras
-- Pedidos — Em breve
+
+| Item | Status |
+|------|--------|
+| Pedidos | Em breve |
 
 ## Vendas
-- Pedidos / Faturas — Em breve
+
+| Item | Status |
+|------|--------|
+| Pedidos / Faturas | Em breve |
 
 ## Estoque
-- Saldos — Em breve
-- Movimentos — Em breve
-- Ajustes — Em breve
+
+| Item | Status |
+|------|--------|
+| Saldos | Em breve |
+| Movimentos | Em breve |
+| Ajustes | Em breve |
 
 ## Financeiro
-- A Pagar — Em breve
-- A Receber — Em breve
-- Baixas — Em breve
-- Cobranças (boletos) — Em breve (Fase 8)
+
+| Item | Status |
+|------|--------|
+| A Pagar | Em breve |
+| A Receber | Em breve |
+| Baixas | Em breve |
+| Cobranças | Em breve (Fase 8) |
 
 ## Banco
-- Importar OFX — Em breve
-- Conciliação — Em breve
 
-## Fiscal
-- Documentos / Emitir / Configuração — fora do menu Fase 0 (Fase 9)
+| Item | Status |
+|------|--------|
+| Importar OFX | Em breve |
+| Conciliação | Em breve |
 
 ## Relatórios
-- Fluxo de Caixa — Em breve
-- Abertos — Em breve
-- Vencidos — Em breve
-- Extrato — Em breve
+
+| Item | Status |
+|------|--------|
+| Fluxo de Caixa | Em breve |
+| Abertos | Em breve |
+| Vencidos | Em breve |
+| Extrato | Em breve |
 
 ## Configurações
-- **Usuários** — implementado (`/config/usuarios`)
-- **Alterar senha** — implementado (`/config/senha`)
-- Integrações — Em breve
+
+| Item | Status | Rota |
+|------|--------|------|
+| Usuários | **Implementado** | `/config/usuarios` |
+| Alterar senha | **Implementado** | `/config/senha` |
+| Integrações | Em breve | — |
+
+## Fora do menu atual
+
+Previstos no PRD, ainda **não** aparecem na nav:
+
+- Fiscal (Documentos, Emitir, Configuração fiscal) — Fase 9
+- Condições de pagamento (cadastro)
+
+---
+
+## Home (`/`)
+
+Atalhos na página inicial (além do menu superior):
+
+| Atalho | Rota |
+|--------|------|
+| Usuários | `/config/usuarios` |
+| Alterar senha | `/config/senha` |
+
+---
+
+## Resumo Fase 0
+
+- **Implementados:** Usuários, Alterar senha  
+- **Stubs no menu:** demais itens listados acima  
+- **Shell:** grupos Cadastros, Compras, Vendas, Estoque, Financeiro, Banco, Relatórios, Configurações
