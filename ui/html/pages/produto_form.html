@@ -1,0 +1,75 @@
+{{define "main"}}
+<div class="page-form-md">
+    <div class="flex items-center gap-3 mb-6">
+        <a href="/cadastros/produtos" class="text-slate-400 hover:text-slate-700">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <h2 class="text-xl font-semibold text-slate-900">{{if .Data.EditMode}}Alterar Produto{{else}}Novo Produto{{end}}</h2>
+    </div>
+    {{if .Flash}}<div class="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-sm">{{.Flash}}</div>{{end}}
+    <div class="form-card">
+        <form action="{{if .Data.EditMode}}/cadastros/produtos/{{.Data.Produto.Codigo}}/edit{{else}}/cadastros/produtos/new{{end}}" method="POST" class="space-y-5">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-800 mb-1">Código</label>
+                    {{if .Data.EditMode}}
+                    <input type="text" value="{{.Data.Produto.Codigo}}" disabled class="form-control text-slate-400">
+                    <p class="mt-1 text-xs text-slate-400">O código não pode ser alterado.</p>
+                    {{else}}
+                    <input type="text" name="codigo" value="{{with .Data.Produto}}{{.Codigo}}{{end}}" required autofocus maxlength="40" class="form-control">
+                    {{end}}
+                </div>
+                <div>
+                    <label for="unidade" class="block text-sm font-medium text-slate-800 mb-1">Unidade</label>
+                    <select id="unidade" name="unidade" required class="form-control">
+                        {{range .Data.Unidades}}
+                        <option value="{{.}}" {{if $.Data.Produto}}{{if eq $.Data.Produto.Unidade .}}selected{{end}}{{end}}>{{.}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label for="descricao" class="block text-sm font-medium text-slate-800 mb-1">Descrição</label>
+                <input type="text" id="descricao" name="descricao" value="{{with .Data.Produto}}{{.Descricao}}{{end}}" required class="form-control">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label for="preco_venda" class="block text-sm font-medium text-slate-800 mb-1">Preço de venda</label>
+                    <input type="number" id="preco_venda" name="preco_venda" step="0.01" min="0" value="{{with .Data.Produto}}{{printf "%.2f" .PrecoVenda}}{{else}}0{{end}}" class="form-control">
+                </div>
+                <div>
+                    <label for="preco_custo" class="block text-sm font-medium text-slate-800 mb-1">Preço de custo</label>
+                    <input type="number" id="preco_custo" name="preco_custo" step="0.01" min="0" value="{{with .Data.Produto}}{{printf "%.2f" .PrecoCusto}}{{else}}0{{end}}" class="form-control">
+                </div>
+                <div>
+                    <label for="estoque_minimo" class="block text-sm font-medium text-slate-800 mb-1">Estoque mínimo</label>
+                    <input type="number" id="estoque_minimo" name="estoque_minimo" step="0.001" min="0" value="{{with .Data.Produto}}{{printf "%.3f" .EstoqueMinimo}}{{else}}0{{end}}" class="form-control">
+                </div>
+            </div>
+
+            <div>
+                <label class="inline-flex items-center gap-2 text-sm font-medium text-slate-800 cursor-pointer">
+                    <input type="checkbox" id="controla_estoque" name="controla_estoque" value="1"
+                        {{with .Data.Produto}}{{if .ControlaEstoque}}checked{{end}}{{else}}checked{{end}}
+                        class="rounded border-slate-300">
+                    Controla estoque
+                </label>
+            </div>
+
+            <div>
+                <label for="observacoes" class="block text-sm font-medium text-slate-800 mb-1">Observações</label>
+                <textarea id="observacoes" name="observacoes" rows="3" class="form-control">{{with .Data.Produto}}{{.Observacoes}}{{end}}</textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Salvar</button>
+                <a href="/cadastros/produtos" class="btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{{end}}

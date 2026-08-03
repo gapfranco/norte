@@ -2,7 +2,7 @@
 
 Espelho do menu atual da UI ([`ui/html/partials/nav.html`](../ui/html/partials/nav.html)).
 
-**Fase:** 0 (fundação)  
+**Fase:** 1 (cadastros em andamento)  
 **Atualizado:** Agosto/2026
 
 | Status | Significado |
@@ -16,14 +16,15 @@ Desktop e mobile exibem os mesmos itens.
 
 ## Cadastros
 
-| Item | Status |
-|------|--------|
-| Negócios / Unidades | Implementado |
-| Pessoas | Em breve |
-| Produtos | Em breve |
-| Categorias | Implementado |
-| Bancos | Implementado |
-| Contas | Implementado |
+| Item | Status | Rota |
+|------|--------|------|
+| Negócios / Unidades | Implementado | `/cadastros/negocios` |
+| Papéis | Implementado | `/cadastros/papeis` |
+| Pessoas | Implementado | `/cadastros/pessoas` |
+| Produtos | Implementado | `/cadastros/produtos` |
+| Categorias | Implementado | `/cadastros/categorias` |
+| Bancos | Implementado | `/cadastros/bancos` |
+| Contas | Implementado | `/cadastros/contas` |
 
 ## Compras
 
@@ -98,8 +99,8 @@ Atalhos na página inicial (além do menu superior):
 
 ---
 
-## Resumo Fase 0
+## Resumo
 
-- **Implementados:** Usuários, Alterar senha  
-- **Stubs no menu:** demais itens listados acima  
+- **Cadastros implementados:** Negócios, Papéis, Pessoas, Produtos, Categorias, Bancos, Contas  
+- **Stubs no menu:** Compras, Vendas, Estoque, Financeiro, Banco, Relatórios (exceto config)  
 - **Shell:** grupos Cadastros, Compras, Vendas, Estoque, Financeiro, Banco, Relatórios, Configurações

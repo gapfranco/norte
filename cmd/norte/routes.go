@@ -61,6 +61,30 @@ func (app *application) routes() http.Handler {
 	protected.HandleFunc("POST /cadastros/negocios/{codigo}/unidades/{ucodigo}/edit", app.unidadeEditPost)
 	protected.HandleFunc("POST /cadastros/negocios/{codigo}/unidades/{ucodigo}/delete", app.unidadeDelete)
 
+	// Cadastros — Papéis
+	protected.HandleFunc("GET /cadastros/papeis", app.papeisList)
+	protected.HandleFunc("GET /cadastros/papeis/new", app.papelNew)
+	protected.HandleFunc("POST /cadastros/papeis/new", app.papelNewPost)
+	protected.HandleFunc("GET /cadastros/papeis/{codigo}/edit", app.papelEdit)
+	protected.HandleFunc("POST /cadastros/papeis/{codigo}/edit", app.papelEditPost)
+	protected.HandleFunc("POST /cadastros/papeis/{codigo}/delete", app.papelDelete)
+
+	// Cadastros — Pessoas
+	protected.HandleFunc("GET /cadastros/pessoas", app.pessoasList)
+	protected.HandleFunc("GET /cadastros/pessoas/new", app.pessoaNew)
+	protected.HandleFunc("POST /cadastros/pessoas/new", app.pessoaNewPost)
+	protected.HandleFunc("GET /cadastros/pessoas/{id}/edit", app.pessoaEdit)
+	protected.HandleFunc("POST /cadastros/pessoas/{id}/edit", app.pessoaEditPost)
+	protected.HandleFunc("POST /cadastros/pessoas/{id}/delete", app.pessoaDelete)
+
+	// Cadastros — Produtos
+	protected.HandleFunc("GET /cadastros/produtos", app.produtosList)
+	protected.HandleFunc("GET /cadastros/produtos/new", app.produtoNew)
+	protected.HandleFunc("POST /cadastros/produtos/new", app.produtoNewPost)
+	protected.HandleFunc("GET /cadastros/produtos/{codigo}/edit", app.produtoEdit)
+	protected.HandleFunc("POST /cadastros/produtos/{codigo}/edit", app.produtoEditPost)
+	protected.HandleFunc("POST /cadastros/produtos/{codigo}/delete", app.produtoDelete)
+
 	// Cadastros — Bancos
 	protected.HandleFunc("GET /cadastros/bancos", app.bancosList)
 	protected.HandleFunc("GET /cadastros/bancos/new", app.bancoNew)

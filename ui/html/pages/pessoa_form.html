@@ -1,0 +1,130 @@
+{{define "main"}}
+<div class="page-form-wide">
+    <div class="flex items-center gap-3 mb-6">
+        <a href="/cadastros/pessoas" class="text-slate-400 hover:text-slate-700">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <h2 class="text-xl font-semibold text-slate-900">{{if .Data.EditMode}}Alterar Pessoa{{else}}Nova Pessoa{{end}}</h2>
+    </div>
+    {{if .Flash}}<div class="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-sm">{{.Flash}}</div>{{end}}
+    <div class="form-card">
+        <form action="{{if .Data.EditMode}}/cadastros/pessoas/{{.Data.Pessoa.ID}}/edit{{else}}/cadastros/pessoas/new{{end}}" method="POST" class="space-y-6">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+            <section class="space-y-4">
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Identificação</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-[10rem_14rem] gap-4 items-start">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-800 mb-1">Tipo</label>
+                        <select name="tipo_pessoa" id="sel-tipo" required class="form-control" onchange="toggleDoc()">
+                            <option value="F" {{with .Data.Pessoa}}{{if eq .TipoPessoa "F"}}selected{{end}}{{end}}>Pessoa Física</option>
+                            <option value="J" {{with .Data.Pessoa}}{{if eq .TipoPessoa "J"}}selected{{end}}{{end}}>Pessoa Jurídica</option>
+                        </select>
+                    </div>
+                    <div id="cpf-wrap">
+                        <label for="cpf" class="block text-sm font-medium text-slate-800 mb-1">CPF</label>
+                        <input type="text" id="cpf" name="cpf" value="{{with .Data.Pessoa}}{{.CPF}}{{end}}" maxlength="14" class="form-control" placeholder="Opcional">
+                    </div>
+                    <div id="cnpj-wrap">
+                        <label for="cnpj" class="block text-sm font-medium text-slate-800 mb-1">CNPJ</label>
+                        <input type="text" id="cnpj" name="cnpj" value="{{with .Data.Pessoa}}{{.CNPJ}}{{end}}" maxlength="18" class="form-control" placeholder="Opcional">
+                    </div>
+                </div>
+                <div>
+                    <label for="nome" class="block text-sm font-medium text-slate-800 mb-1">Nome / Razão social</label>
+                    <input type="text" id="nome" name="nome" value="{{with .Data.Pessoa}}{{.Nome}}{{end}}" required autofocus class="form-control">
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Papéis</h3>
+                <div class="flex flex-wrap gap-x-5 gap-y-2">
+                    {{range .Data.PapeisOpcoes}}
+                    <label class="inline-flex items-center gap-2 text-sm text-slate-700">
+                        <input type="checkbox" name="papeis" value="{{.Codigo}}" {{if index $.Data.PapeisSelected .Codigo}}checked{{end}} class="rounded border-slate-300">
+                        {{.Nome}}
+                    </label>
+                    {{else}}
+                    <p class="text-sm text-amber-700">Cadastre papéis em Cadastros → Papéis antes de continuar.</p>
+                    {{end}}
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Contato</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-slate-800 mb-1">E-mail</label>
+                        <input type="email" id="email" name="email" value="{{with .Data.Pessoa}}{{.Email}}{{end}}" class="form-control">
+                    </div>
+                    <div>
+                        <label for="telefone" class="block text-sm font-medium text-slate-800 mb-1">Telefone</label>
+                        <input type="text" id="telefone" name="telefone" value="{{with .Data.Pessoa}}{{.Telefone}}{{end}}" class="form-control">
+                    </div>
+                    <div>
+                        <label for="celular" class="block text-sm font-medium text-slate-800 mb-1">Celular</label>
+                        <input type="text" id="celular" name="celular" value="{{with .Data.Pessoa}}{{.Celular}}{{end}}" class="form-control">
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Endereço</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-[8rem_1fr_6rem] gap-4">
+                    <div>
+                        <label for="cep" class="block text-sm font-medium text-slate-800 mb-1">CEP</label>
+                        <input type="text" id="cep" name="cep" value="{{with .Data.Pessoa}}{{.CEP}}{{end}}" maxlength="9" class="form-control">
+                    </div>
+                    <div>
+                        <label for="logradouro" class="block text-sm font-medium text-slate-800 mb-1">Logradouro</label>
+                        <input type="text" id="logradouro" name="logradouro" value="{{with .Data.Pessoa}}{{.Logradouro}}{{end}}" class="form-control">
+                    </div>
+                    <div>
+                        <label for="numero" class="block text-sm font-medium text-slate-800 mb-1">Número</label>
+                        <input type="text" id="numero" name="numero" value="{{with .Data.Pessoa}}{{.Numero}}{{end}}" class="form-control">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_4rem] gap-4">
+                    <div>
+                        <label for="complemento" class="block text-sm font-medium text-slate-800 mb-1">Complemento</label>
+                        <input type="text" id="complemento" name="complemento" value="{{with .Data.Pessoa}}{{.Complemento}}{{end}}" class="form-control">
+                    </div>
+                    <div>
+                        <label for="bairro" class="block text-sm font-medium text-slate-800 mb-1">Bairro</label>
+                        <input type="text" id="bairro" name="bairro" value="{{with .Data.Pessoa}}{{.Bairro}}{{end}}" class="form-control">
+                    </div>
+                    <div>
+                        <label for="cidade" class="block text-sm font-medium text-slate-800 mb-1">Cidade</label>
+                        <input type="text" id="cidade" name="cidade" value="{{with .Data.Pessoa}}{{.Cidade}}{{end}}" class="form-control">
+                    </div>
+                    <div>
+                        <label for="uf" class="block text-sm font-medium text-slate-800 mb-1">UF</label>
+                        <input type="text" id="uf" name="uf" value="{{with .Data.Pessoa}}{{.UF}}{{end}}" maxlength="2" class="form-control uppercase">
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Observações</h3>
+                <div>
+                    <label for="observacoes" class="sr-only">Observações</label>
+                    <textarea id="observacoes" name="observacoes" rows="3" class="form-control">{{with .Data.Pessoa}}{{.Observacoes}}{{end}}</textarea>
+                </div>
+            </section>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Salvar</button>
+                <a href="/cadastros/pessoas" class="btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+function toggleDoc() {
+    var tipo = document.getElementById('sel-tipo').value;
+    document.getElementById('cpf-wrap').style.display = tipo === 'F' ? '' : 'none';
+    document.getElementById('cnpj-wrap').style.display = tipo === 'J' ? '' : 'none';
+}
+toggleDoc();
+</script>
+{{end}}

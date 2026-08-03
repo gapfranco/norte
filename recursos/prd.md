@@ -134,8 +134,9 @@ Vocabulário de UI (obrigatório): **Confirmar venda** ≠ **Gerar boleto** ≠ 
 
 | Cadastro | Essencial v1 |
 |----------|----------------|
-| Pessoas | tipo C/F/Ambos, nome, CPF/CNPJ opcional, contato |
-| Produtos | código, descrição, unidade, preço venda, ativo; flag controla estoque |
+| Papéis | código + nome; seed cliente/fornecedor/vendedor/representante |
+| Pessoas | PF/PJ, nome, CPF/CNPJ opcional, contato, endereço magro; papéis N:N via `pessoa_papeis` |
+| Produtos | código, descrição, unidade, preços, flag controla estoque, estoque mínimo |
 | Categorias financeiras | entrada/saída (+ classe de despesa opcional) |
 | Bancos / contas bancárias | FEBRABAN ou cadastro manual + conta |
 | Condições de pagamento | ex.: à vista, 30 dias, 30/60 (gera N títulos) — MVP pode começar com à vista + N dias únicos |
@@ -353,7 +354,7 @@ Entidades centrais (orientação; tipos/FKs no doc de modelagem):
 |----------|--------|
 | `users` | Autenticação |
 | `empresas` / `unidades` | Contexto organizacional |
-| `pessoas` | Cliente / fornecedor (+ campos fiscais na Fase 9) |
+| `papeis` / `pessoas` / `pessoa_papeis` | Papéis cadastráveis; PF/PJ (+ campos fiscais na Fase 9) |
 | `produtos` | Itens comercializados (+ NCM/origem na Fase 9) |
 | `estoque_movimentos` / `estoque_saldos` | Controle de saldo |
 | `pedidos_compra` / `pedido_compra_itens` | Compras |
@@ -387,7 +388,7 @@ Entidades centrais (orientação; tipos/FKs no doc de modelagem):
 - Menu sugerido:
 
 ```
-Cadastros → Negócios/Unidades, Pessoas, Produtos, Categorias, Bancos, Contas
+Cadastros → Negócios/Unidades, Papéis, Pessoas, Produtos, Categorias, Bancos, Contas
 Compras → Pedidos, Entradas (se separado)
 Vendas → Pedidos / Faturas
 Estoque → Saldos, Movimentos, Ajustes
@@ -524,10 +525,10 @@ Itens Cobranças, Fiscal e Integrações ficam desabilitados (“Em breve”) at
 ## 16. Próximos Passos
 
 1. Criar repositório `norte` e promover este PRD para `recursos/prd.md`  
-2. Escrever `recursos/modelagem.md` (DDL magro das entidades §9, incluindo `cobrancas` e `documentos_fiscais` como fases posteriores)  
-3. Escrever `recursos/menu.md` espelhando §10  
-4. Bootstrap Fase 0 (auth + shell + migrate)  
-5. Implementar Fases 0–7 na ordem, sem pular aceite  
+2. ~~Escrever `recursos/modelagem.md`~~ (parcial: papéis/pessoas/produtos + existentes; restante nas fases)  
+3. ~~Escrever `recursos/menu.md` espelhando §10~~  
+4. ~~Bootstrap Fase 0 (auth + shell + migrate)~~  
+5. Implementar Fases 1–7 na ordem, sem pular aceite  
 6. Só então Fase 8 (boleto) e Fase 9 (NF-e)  
 
 ---

@@ -1,0 +1,34 @@
+{{define "main"}}
+<div class="page-form">
+    <div class="flex items-center gap-3 mb-6">
+        <a href="/cadastros/papeis" class="text-slate-400 hover:text-slate-700">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <h2 class="text-xl font-semibold text-slate-900">{{if .Data.EditMode}}Alterar Papel{{else}}Novo Papel{{end}}</h2>
+    </div>
+    {{if .Flash}}<div class="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-sm">{{.Flash}}</div>{{end}}
+    <div class="form-card">
+        <form action="{{if .Data.EditMode}}/cadastros/papeis/{{.Data.Papel.Codigo}}/edit{{else}}/cadastros/papeis/new{{end}}" method="POST" class="space-y-5">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+            <div>
+                <label class="block text-sm font-medium text-slate-800 mb-1">Código</label>
+                {{if .Data.EditMode}}
+                <input type="text" value="{{.Data.Papel.Codigo}}" disabled class="w-48 form-control text-slate-400">
+                <p class="mt-1 text-xs text-slate-400">O código não pode ser alterado.</p>
+                {{else}}
+                <input type="text" name="codigo" value="{{with .Data.Papel}}{{.Codigo}}{{end}}" required autofocus maxlength="40" class="w-48 form-control">
+                <p class="mt-1 text-xs text-slate-400">Ex: cliente, transportadora. Não pode ser alterado depois.</p>
+                {{end}}
+            </div>
+            <div>
+                <label for="nome" class="block text-sm font-medium text-slate-800 mb-1">Nome</label>
+                <input type="text" id="nome" name="nome" value="{{with .Data.Papel}}{{.Nome}}{{end}}" required class="form-control">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Salvar</button>
+                <a href="/cadastros/papeis" class="btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{{end}}

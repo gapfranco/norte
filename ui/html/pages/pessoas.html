@@ -1,0 +1,108 @@
+{{define "main"}}
+<div class="page-list-wide">
+    <div class="page-toolbar">
+        <h2 class="text-xl font-semibold text-slate-900">Pessoas</h2>
+        <a href="/cadastros/pessoas/new" class="btn-primary w-full sm:w-auto">Nova Pessoa</a>
+    </div>
+    <form method="GET" action="/cadastros/pessoas" class="filter-bar">
+        <input type="text" name="nome" value="{{.Data.FilterNome}}" placeholder="Nome" class="form-control">
+        <input type="text" name="documento" value="{{.Data.FilterDocumento}}" placeholder="CPF/CNPJ" class="form-control sm:!flex-none sm:!w-40">
+        <select name="papel" class="form-control sm:!flex-none sm:!w-auto">
+            <option value="">Papel</option>
+            {{range .Data.Papeis}}
+            <option value="{{.Codigo}}" {{if eq $.Data.FilterPapel .Codigo}}selected{{end}}>{{.Nome}}</option>
+            {{end}}
+        </select>
+        <button type="submit" class="btn-primary w-full sm:w-auto">Buscar</button>
+        {{if or .Data.FilterNome .Data.FilterDocumento .Data.FilterPapel}}
+        <a href="/cadastros/pessoas" class="btn-secondary w-full sm:w-auto">Limpar</a>
+        {{end}}
+    </form>
+    <div class="table-card">
+        {{if .Data.Pessoas}}
+        <div class="mobile-card-list">
+            {{range .Data.Pessoas}}
+            <div class="mobile-card">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="mobile-card-title truncate">{{.Nome}}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">{{if eq .TipoPessoa "F"}}PF{{else}}PJ{{end}}{{if .CPF}} · {{.CPF}}{{end}}{{if .CNPJ}} · {{.CNPJ}}{{end}}</p>
+                    </div>
+                </div>
+                <div class="mobile-card-meta flex flex-wrap gap-1">
+                    {{range .Papeis}}<span class="badge badge-muted">{{.Nome}}</span>{{end}}
+                </div>
+                <div class="mobile-card-actions">
+                    <a href="/cadastros/pessoas/{{.ID}}/edit" class="btn-ghost btn-sm">Alterar</a>
+                    <form action="/cadastros/pessoas/{{.ID}}/delete" method="POST" onsubmit="return confirm('Excluir {{.Nome}}?')">
+                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                        <button type="submit" class="btn-danger btn-sm">Excluir</button>
+                    </form>
+                </div>
+            </div>
+            {{end}}
+        </div>
+        <div class="hidden sm:block table-scroll">
+        <table class="list-table">
+            <thead class="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+                <tr>
+                    <th class="px-4 py-3">Nome</th>
+                    <th class="px-4 py-3 w-20">Tipo</th>
+                    <th class="px-4 py-3">Documento</th>
+                    <th class="px-4 py-3">Papéis</th>
+                    <th class="px-4 py-3 text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {{range .Data.Pessoas}}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-4 py-3 font-medium text-slate-800">{{.Nome}}</td>
+                    <td class="px-4 py-3 text-slate-700">{{if eq .TipoPessoa "F"}}PF{{else}}PJ{{end}}</td>
+                    <td class="px-4 py-3 text-slate-700">{{if .CPF}}{{.CPF}}{{else if .CNPJ}}{{.CNPJ}}{{else}}—{{end}}</td>
+                    <td class="px-4 py-3">
+                        <div class="flex flex-wrap gap-1">
+                            {{range .Papeis}}<span class="badge badge-muted">{{.Nome}}</span>{{end}}
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        <div class="inline-flex items-center gap-2">
+                            <a href="/cadastros/pessoas/{{.ID}}/edit" class="btn-ghost btn-sm">Alterar</a>
+                            <form action="/cadastros/pessoas/{{.ID}}/delete" method="POST" onsubmit="return confirm('Excluir {{.Nome}}?')">
+                                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                                <button type="submit" class="btn-danger btn-sm">Excluir</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+        </div>
+        <div class="pagination-bar">
+            <div>
+                Mostrando <span class="font-semibold">{{len .Data.Pessoas}}</span> de <span class="font-semibold">{{.Data.Pagination.TotalItems}}</span> registros
+            </div>
+            <div class="pagination-pages">
+                <a href="/cadastros/pessoas?page={{.Data.Pagination.PrevPage}}&nome={{.Data.FilterNome}}&documento={{.Data.FilterDocumento}}&papel={{.Data.FilterPapel}}"
+                    class="pagination-btn {{if not .Data.Pagination.HasPrev}}pagination-btn-disabled{{end}}">Anterior</a>
+                {{range .Data.Pagination.Pages}}
+                {{if .Ellipsis}}
+                <span class="pagination-ellipsis">…</span>
+                {{else if .Current}}
+                <span class="pagination-current">{{.Page}}</span>
+                {{else}}
+                <a href="/cadastros/pessoas?page={{.Page}}&nome={{$.Data.FilterNome}}&documento={{$.Data.FilterDocumento}}&papel={{$.Data.FilterPapel}}" class="pagination-btn">{{.Page}}</a>
+                {{end}}
+                {{end}}
+                <a href="/cadastros/pessoas?page={{.Data.Pagination.NextPage}}&nome={{.Data.FilterNome}}&documento={{.Data.FilterDocumento}}&papel={{.Data.FilterPapel}}"
+                    class="pagination-btn {{if not .Data.Pagination.HasNext}}pagination-btn-disabled{{end}}">Próxima</a>
+            </div>
+        </div>
+        {{else}}
+        <div class="p-12 text-center text-slate-400 italic">
+            {{if or .Data.FilterNome .Data.FilterDocumento .Data.FilterPapel}}Nenhuma pessoa encontrada.{{else}}Nenhuma pessoa cadastrada.{{end}}
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}

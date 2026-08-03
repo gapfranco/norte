@@ -10,8 +10,9 @@
         </button>
         <div id="menu-cadastros" class="dropdown-menu nav-dropdown hidden w-56">
             <a href="/cadastros/negocios" class="nav-dropdown-item {{if eq .ActiveSubmenu "negocios"}}nav-dropdown-item-active{{end}}">Negócios / Unidades</a>
-            <span class="nav-dropdown-item-disabled">Pessoas <span class="badge badge-muted">Em breve</span></span>
-            <span class="nav-dropdown-item-disabled">Produtos <span class="badge badge-muted">Em breve</span></span>
+            <a href="/cadastros/papeis" class="nav-dropdown-item {{if eq .ActiveSubmenu "papeis"}}nav-dropdown-item-active{{end}}">Papéis</a>
+            <a href="/cadastros/pessoas" class="nav-dropdown-item {{if eq .ActiveSubmenu "pessoas"}}nav-dropdown-item-active{{end}}">Pessoas</a>
+            <a href="/cadastros/produtos" class="nav-dropdown-item {{if eq .ActiveSubmenu "produtos"}}nav-dropdown-item-active{{end}}">Produtos</a>
             <a href="/cadastros/categorias" class="nav-dropdown-item {{if eq .ActiveSubmenu "categorias"}}nav-dropdown-item-active{{end}}">Categorias</a>
             <a href="/cadastros/bancos" class="nav-dropdown-item {{if eq .ActiveSubmenu "bancos"}}nav-dropdown-item-active{{end}}">Bancos</a>
             <a href="/cadastros/contas" class="nav-dropdown-item {{if eq .ActiveSubmenu "contas"}}nav-dropdown-item-active{{end}}">Contas</a>
@@ -113,8 +114,9 @@
 {{define "nav_mobile"}}
 <p class="nav-mobile-section">Cadastros</p>
 <a href="/cadastros/negocios" class="nav-mobile-link {{if eq .ActiveSubmenu "negocios"}}nav-mobile-link-active{{end}}">Negócios / Unidades</a>
-<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Pessoas <span class="badge badge-muted">Em breve</span></span>
-<span class="nav-mobile-link text-slate-400 cursor-not-allowed">Produtos <span class="badge badge-muted">Em breve</span></span>
+<a href="/cadastros/papeis" class="nav-mobile-link {{if eq .ActiveSubmenu "papeis"}}nav-mobile-link-active{{end}}">Papéis</a>
+<a href="/cadastros/pessoas" class="nav-mobile-link {{if eq .ActiveSubmenu "pessoas"}}nav-mobile-link-active{{end}}">Pessoas</a>
+<a href="/cadastros/produtos" class="nav-mobile-link {{if eq .ActiveSubmenu "produtos"}}nav-mobile-link-active{{end}}">Produtos</a>
 <a href="/cadastros/categorias" class="nav-mobile-link {{if eq .ActiveSubmenu "categorias"}}nav-mobile-link-active{{end}}">Categorias</a>
 <a href="/cadastros/bancos" class="nav-mobile-link {{if eq .ActiveSubmenu "bancos"}}nav-mobile-link-active{{end}}">Bancos</a>
 <a href="/cadastros/contas" class="nav-mobile-link {{if eq .ActiveSubmenu "contas"}}nav-mobile-link-active{{end}}">Contas</a>
